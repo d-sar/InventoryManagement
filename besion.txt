@@ -1,0 +1,50 @@
+les besoins fonctionnels 
+
+### **1. Gestion des Partenaires (Clients/Fournisseurs)**
+- **CRUD Partenaire** : Créer, lire, mettre à jour et supprimer un partenaire (client ou fournisseur).
+- **Différenciation Client/Fournisseur** : Gérer les spécificités des clients et des fournisseurs.
+- **Recherche de partenaires** : Par nom, type (client/fournisseur), ou autres critères.
+
+### **2. Gestion des Produits**
+- **CRUD Produit** : Ajouter, modifier, supprimer et consulter les produits.
+- **Gestion des stocks** : Mettre à jour la quantité en stock lors des transactions.
+- **Recherche de produits** : Par catégorie, libellé, prix, etc.
+
+### **3. Gestion des Catégories**
+- **CRUD Catégorie** : Créer et gérer les catégories de produits.
+- **Affectation des produits** : Associer un produit à une catégorie.
+
+### **4. Gestion des Bons (Commandes/Factures)**
+- **CRUD Bon** : Créer, valider, annuler et consulter les bons (commandes pour les clients, factures pour les fournisseurs).
+- **Calcul du total** : Calcul automatique du montant total d'un bon (méthode `calculerTotal()`).
+- **Génération de numéros** : Attribution automatique d'un numéro unique aux bons.
+- **Filtrage des bons** : Par date, partenaire, type de document, etc.
+
+### **5. Gestion des Lignes de Bon**
+- **Ajout/Modification de lignes** : Ajouter ou modifier des produits dans un bon.
+- **Validation des quantités** : Vérifier que la quantité demandée est disponible en stock (pour les commandes clients).
+
+### **6. Gestion des Types de Documents**
+- **CRUD docType** : Définir les types de documents (ex: "Bon de commande", "Facture", "Devis").
+- **Association aux bons** : Lier un bon à un type de document pour le classer.
+
+### **7. Fonctionnalités Transverses**
+- **Historique des transactions** : Consulter l'historique des bons par partenaire ou produit.
+- **Notifications** : Alerter en cas de stock faible ou de validation de bon.
+- **Export/Reporting** : Générer des états (PDF, Excel) pour les bons, stocks, etc.
+
+### **Cas d'utilisation clés**
+- Un **client** passe une commande ? Création d'un "Bon de commande" avec des lignes associées.
+- Un **fournisseur** livre des produits ? Création d'une "Facture fournisseur".
+- Le système met à jour les **stocks** après chaque transaction.
+- Un administrateur gère les **catégories** et les **types de documents**.
+
+### **Contraintes Fonctionnelles**
+- Un bon doit être lié à un partenaire (client ou fournisseur) et à un type de document.
+- Le prix unitaire dans une ligne de bon doit être cohérent avec le prix du produit (ou négociable pour les fournisseurs).
+- La quantité en stock ne peut pas être négative.
+
+
+
+
+

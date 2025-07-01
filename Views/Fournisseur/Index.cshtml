@@ -1,0 +1,90 @@
+﻿@model IEnumerable<InventoryManagementMVC.Models.ViewModels.FournisseurViewModel>
+
+@{
+    ViewData["Title"] = "Liste des Fournisseurs";
+}
+
+<div class="container-fluid">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-truck mr-2"></i>@ViewData["Title"]
+            </h6>
+            <a asp-action="Create" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus mr-1"></i>Nouveau Fournisseur
+            </a>
+        </div>
+        <div class="card-body">
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle mr-2"></i> @TempData["Success"]
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            }
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-hover" id="dataTable" width="100%" cellspacing="0">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>@Html.DisplayNameFor(model => model.Nom)</th>
+                            <th>@Html.DisplayNameFor(model => model.Email)</th>
+                            <th>@Html.DisplayNameFor(model => model.Telephone)</th>
+                            <th>@Html.DisplayNameFor(model => model.NombreLivraisons)</th>
+                            <th>@Html.DisplayNameFor(model => model.TotalFournitures)</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <a asp-action="Details" asp-route-id="@item.Id">@item.Nom</a>
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(item.Email))
+                                    {
+                                        <a href="mailto:@item.Email">@item.Email</a>
+                                    }
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(item.Telephone))
+                                    {
+                                        <a href="tel:@item.Telephone">@item.Telephone</a>
+                                    }
+                                </td>
+                                <td>@item.NombreLivraisons</td>
+                                <td>@item.TotalFournitures.ToString("C")</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#dataTable').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.10.25/i18n/French.json'
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,66 @@
+﻿@model InventoryManagementMVC.Models.ViewModels.CategorieDetailsViewModel
+
+@{
+    ViewData["Title"] = "Détails de la Catégorie";
+}
+
+<div class="view-section">
+    <h2 class="view-title">Détails de la Catégorie</h2>
+
+    <div class="container">
+        <h1>Détails de la Catégorie</h1>
+
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3>@Model.Nom</h3>
+            <p><strong>Description:</strong> @Model.Description</p>
+            <p><strong>Nombre de produits:</strong> <span class="badge badge-info">@Model.NombreProduits</span></p>
+            <p><strong>Date de création:</strong> @Model.DateCreation.ToString("dd/MM/yyyy")</p>
+        </div>
+
+        <h3>Produits dans cette catégorie</h3>
+
+        @if (Model.Produits != null && Model.Produits.Any())
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Libellé</th>
+                        <th>Prix Unitaire</th>
+                        <th>Stock</th>
+                        <th>Statut Stock</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var produit in Model.Produits)
+                    {
+                        var badgeClass = produit.QuantiteStock < 10 ? "badge-warning" : "badge-info";
+                        var stockStatus = produit.QuantiteStock < 10 ? "Stock faible" : "Stock normal";
+
+                        <tr>
+                            <td>@produit.Libelle</td>
+                            <td>@produit.PrixUnitaire.ToString("C")</td>
+                            <td>@produit.QuantiteStock</td>
+                            <td>
+                                <span class="badge @badgeClass">@stockStatus</span>
+                            </td>
+                            <td>
+                                <a href="@Url.Action("Details", "Produit", new { id = produit.IdProduit })" class="btn btn-primary btn-sm">Voir</a>
+                                <a href="@Url.Action("Edit", "Produit", new { id = produit.IdProduit })" class="btn btn-warning btn-sm">Modifier</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>Aucun produit dans cette catégorie.</p>
+        }
+
+        <div style="margin-top: 20px;">
+            <a href="@Url.Action("Edit", "Categorie", new { id = Model.IdCategorie })" class="btn btn-warning">Modifier</a>
+            <a href="@Url.Action("Index", "Categorie")" class="btn btn-secondary">Retour à la liste</a>
+        </div>
+    </div>
+</div>

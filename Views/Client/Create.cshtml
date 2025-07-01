@@ -1,0 +1,149 @@
+﻿@model InventoryManagementMVC.Models.ViewModels.ClientViewModel
+
+@{
+    ViewData["Title"] = "Nouveau Client";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title">
+                        <i class="fas fa-user-plus mr-2"></i>
+                        @ViewData["Title"]
+                    </h3>
+                </div>
+                <form asp-action="Create" id="clientForm">
+                    <div class="card-body">
+                        @if (ViewData.ModelState.ErrorCount > 0)
+                        {
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="fas fa-exclamation-triangle mr-2"></i>
+                                <div asp-validation-summary="All"></div>
+                                <button type="button" class="close" data-dismiss="alert">
+                                    <span>&times;</span>
+                                </button>
+                            </div>
+                        }
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <!-- Nom -->
+                                <div class="form-group">
+                                    <label asp-for="Nom" class="control-label"></label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                        </div>
+                                        <input asp-for="Nom" class="form-control" placeholder="Entrez le nom complet" />
+                                    </div>
+                                    <span asp-validation-for="Nom" class="text-danger"></span>
+                                </div>
+
+                                <!-- Email -->
+                                <div class="form-group">
+                                    <label asp-for="Email" class="control-label"></label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                        </div>
+                                        <input asp-for="Email" class="form-control" placeholder="exemple@domaine.com" />
+                                    </div>
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <!-- Téléphone -->
+                                <div class="form-group">
+                                    <label asp-for="Telephone" class="control-label"></label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                        </div>
+                                        <input asp-for="Telephone" class="form-control" placeholder="+212 6 12 34 56 78" />
+                                    </div>
+                                    <span asp-validation-for="Telephone" class="text-danger"></span>
+                                </div>
+
+                                <!-- Statut -->
+                                <div class="form-group">
+                                    <label asp-for="EstActif" class="control-label"></label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-toggle-on"></i></span>
+                                        </div>
+                                        <select asp-for="EstActif" class="form-control">
+                                            <option value="true">Actif</option>
+                                            <option value="false">Inactif</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Adresse -->
+                        <div class="form-group">
+                            <label asp-for="Adresse" class="control-label"></label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                                </div>
+                                <textarea asp-for="Adresse" class="form-control" rows="3" placeholder="Adresse complète"></textarea>
+                            </div>
+                            <span asp-validation-for="Adresse" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="card-footer text-right">
+                        <a asp-action="Index" class="btn btn-secondary mr-2">
+                            <i class="fas fa-arrow-left mr-1"></i>
+                            Retour à la liste
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save mr-1"></i>
+                            Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function() {
+            // Configuration des messages d'erreur
+            $.validator.setDefaults({
+                errorClass: 'is-invalid',
+                validClass: 'is-valid',
+                errorElement: 'span',
+                errorPlacement: function (error, element) {
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                    } else {
+                        error.insertAfter(element);
+                    }
+                },
+                highlight: function (element, errorClass, validClass) {
+                    $(element).addClass(errorClass).removeClass(validClass);
+                    $(element).closest('.form-group').find('.input-group-text').addClass('border-danger');
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    $(element).removeClass(errorClass).addClass(validClass);
+                    $(element).closest('.form-group').find('.input-group-text').removeClass('border-danger');
+                }
+            });
+
+            // Masquer l'alerte après 5 secondes
+            setTimeout(function() {
+                $('.alert').alert('close');
+            }, 5000);
+        });
+    </script>
+}

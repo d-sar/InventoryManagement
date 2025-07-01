@@ -1,0 +1,94 @@
+﻿@model IEnumerable<InventoryManagementMVC.Models.ViewModels.CategorieViewModel>
+@{
+    ViewData["Title"] = "Liste des Categories";
+
+}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-box text-primary"></i> @ViewData["Title"]</h2>
+    <a asp-action="Create" class="btn btn-success">
+        <i class="fas fa-tags"></i> Nouveau Categorie
+    </a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form asp-action="Index" method="get">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="searchString" class="form-label">Rechercher</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text" class="form-control" id="searchString" name="searchString"
+                               value="@ViewBag.SearchString" placeholder="Nom du produit...">
+                    </div>
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="fas fa-filter"></i> Filtrer
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="fas fa-times"></i> Effacer
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tableau des catégories -->
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-dark">
+
+                    <tr>
+                        <th>Nom</th>
+                        <th>Description</th>
+                        <th>Nombre de Produits</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var categorie in Model)
+                    {
+                        <tr>
+                            <td>@categorie.Nom</td>
+                            <td>@categorie.Description</td>
+                            <td><span>@categorie.NombreProduits</span></td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a asp-action="Details" asp-route-id="@categorie.IdCategorie" class="btn btn-sm btn-outline-info" title="Détails">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@categorie.IdCategorie" class="btn btn-sm btn-outline-warning" title="Modifier">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@categorie.IdCategorie" class="btn btn-sm btn-outline-danger" title="Supprimer">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="view-section">
+    
+
+    <div class="container">
+        
+        <!-- Messages de notification -->
+        <div id="temp-data-success" class="alert alert-success" style="display: none;">
+            Opération réussie !
+        </div>
+        <div id="temp-data-error" class="alert alert-danger" style="display: none;">
+            Une erreur s'est produite.
+        </div>
+ 
+    </div>
+</div>

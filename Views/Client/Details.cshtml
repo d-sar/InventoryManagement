@@ -1,0 +1,88 @@
+﻿@model InventoryManagementMVC.Models.ViewModels.ClientViewModel
+
+@{
+    ViewData["Title"] = "Détails du Client";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title">
+                        <i class="fas fa-user mr-2"></i>
+                        Détails du Client
+                    </h3>
+                    <div class="btn-group">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                            <i class="fas fa-edit mr-1"></i>
+                            Modifier
+                        </a>
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left mr-1"></i>
+                            Retour
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5 class="text-primary">Informations Générales</h5>
+                            <hr>
+                            <dl class="row">
+                                <dt class="col-sm-4">@Html.DisplayNameFor(model => model.Nom):</dt>
+                                <dd class="col-sm-8">
+                                    <strong>@Html.DisplayFor(model => model.Nom)</strong>
+                                </dd>
+
+                                <dt class="col-sm-4">@Html.DisplayNameFor(model => model.Email):</dt>
+                                <dd class="col-sm-8">
+                                    @if (!string.IsNullOrEmpty(Model.Email))
+                                    {
+                                        <a href="mailto:@Model.Email">@Model.Email</a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Non renseigné</span>
+                                    }
+                                </dd>
+
+                                <dt class="col-sm-4">@Html.DisplayNameFor(model => model.Telephone):</dt>
+                                <dd class="col-sm-8">
+                                    @if (!string.IsNullOrEmpty(Model.Telephone))
+                                    {
+                                        <a href="tel:@Model.Telephone">@Model.Telephone</a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Non renseigné</span>
+                                    }
+                                </dd>
+
+                               
+                            </dl>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h5 class="text-success">Statistiques</h5>
+                            <hr>
+                            <dl class="row">
+                                <dt class="col-sm-6">@Html.DisplayNameFor(model => model.NombreBons):</dt>
+                                <dd class="col-sm-6">
+                                    <span class="badge badge-primary badge-lg">@Model.NombreBons</span>
+                                </dd>
+
+                                <dt class="col-sm-6">@Html.DisplayNameFor(model => model.TotalAchats):</dt>
+                                <dd class="col-sm-6">
+                                    <strong class="text-success">@Model.TotalAchats.ToString("C")</strong>
+                                </dd>
+
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+                 
