@@ -1,0 +1,241 @@
+﻿@using InventoryManagementMVC.Models.Entities
+@model Bon
+
+@{
+    ViewData["Title"] = $"Impression - Bon d'Entrée N° {Model.Numero}";
+    Layout = null; // Pas de layout pour l'impression
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link href="~/css/BEprint.css" rel="stylesheet" />
+
+</head>
+<body>
+    <!-- Boutons d'action (masqués à l'impression) -->
+    <div class="no-print mb-3">
+        <div class="d-flex justify-content-between">
+            <button onclick="window.print()" class="btn btn-primary">
+                <i class="fas fa-print me-1"></i>Imprimer
+            </button>
+            <button onclick="window.close()" class="btn btn-secondary">
+                <i class="fas fa-times me-1"></i>Fermer
+            </button>
+        </div>
+        <hr>
+    </div>
+
+    <!-- En-tête de l'entreprise -->
+    <div class="header-company">
+        <div class="row">
+            <div class="col-6">
+                <h1><i class="fas fa-industry me-2"></i>MonEntreprise SARL</h1>
+                <p class="mb-1">123 Rue de l'Industrie</p>
+                <p class="mb-1">75001 Paris, France</p>
+                <p class="mb-1">Tél: +33 1 23 45 67 89</p>
+                <p class="mb-0">Email: contact@monentreprise.fr</p>
+            </div>
+            <div class="col-6 text-end">
+                <p class="mb-1"><strong>SIRET:</strong> 123 456 789 00012</p>
+                <p class="mb-1"><strong>TVA:</strong> FR12345678901</p>
+                <p class="mb-0"><strong>Date d'impression:</strong> @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Titre du document -->
+    <div class="document-title">
+        <h2><i class="fas fa-truck-loading me-2"></i>BON D'ENTRÉE FOURNISSEUR</h2>
+        <p class="mb-0"><strong>N° BE-@Model.Numero.ToString("D6")</strong></p>
+    </div>
+
+    <!-- Informations du bon et du fournisseur -->
+    <div class="row">
+        <div class="col-6">
+            <div class="info-section">
+                <h5><i class="fas fa-info-circle me-2"></i>Informations du bon</h5>
+                <table class="info-table w-100">
+                    <tr>
+                        <td>Numéro:</td>
+                        <td><strong>BE-@Model.Numero.ToString("D6")</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Date:</td>
+                        <td>@Model.Date.ToString("dddd dd MMMM yyyy", new System.Globalization.CultureInfo("fr-FR"))</td>
+                    </tr>
+                    <tr>
+                        <td>Heure:</td>
+                        <td>@Model.Date.ToString("HH:mm")</td>
+                    </tr>
+                    <tr>
+                        <td>Type:</td>
+                        <td>@Model.DocType.Titre</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <div class="col-6">
+            <div class="info-section">
+                <h5><i class="fas fa-building me-2"></i>Fournisseur</h5>
+                <table class="info-table w-100">
+                    <tr>
+                        <td>Nom:</td>
+                        <td><strong>@Model.Partenaire.Nom</strong></td>
+                    </tr>
+                    @if (!string.IsNullOrEmpty(Model.Partenaire.Email))
+                    {
+                        <tr>
+                            <td>Email:</td>
+                            <td>@Model.Partenaire.Email</td>
+                        </tr>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.Partenaire.Telephone))
+                    {
+                        <tr>
+                            <td>Téléphone:</td>
+                            <td>@Model.Partenaire.Telephone</td>
+                        </tr>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.Partenaire.Adresse))
+                    {
+                        <tr>
+                            <td>Adresse:</td>
+                            <td>@Model.Partenaire.Adresse</td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tableau des articles -->
+    <div class="info-section">
+        <h5><i class="fas fa-list me-2"></i>Détail des articles reçus (@Model.LignesBon.Count article(s))</h5>
+        
+        <table class="products-table">
+            <thead>
+                <tr>
+                    <th style="width: 5%">#</th>
+                    <th style="width: 35%">Produit</th>
+                    <th style="width: 15%">Catégorie</th>
+                    <th style="width: 10%" class="text-center">Quantité</th>
+                    <th style="width: 15%" class="text-end">Prix unitaire</th>
+                    <th style="width: 20%" class="text-end">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{int index = 1;}
+                @foreach (var ligne in Model.LignesBon)
+                {
+                    <tr>
+                        <td class="text-center">@index</td>
+                        <td>
+                            <strong>@ligne.Produit.Libelle</strong>
+                            @if (!string.IsNullOrEmpty(ligne.Produit.Description))
+                            {
+                                <br><small style="color: #6c757d;">@ligne.Produit.Description</small>
+                            }
+                        </td>
+                        <td>@ligne.Produit.Categorie.Nom</td>
+                        <td class="text-center"><strong>@ligne.Quantite</strong></td>
+                        <td class="text-end">@ligne.PrixUnitaire.ToString("C")</td>
+                        <td class="text-end"><strong>@((ligne.Quantite * ligne.PrixUnitaire).ToString("C"))</strong></td>
+                    </tr>
+                    index++;
+                }
+            </tbody>
+            <tfoot>
+                <tr class="total-row">
+                    <td colspan="5" class="text-end"><strong>TOTAL GÉNÉRAL:</strong></td>
+                    <td class="text-end"><strong style="font-size: 14px;">@Model.CalculerTotal().ToString("C")</strong></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <!-- Résumé statistiques -->
+    <div class="summary-section">
+        <h5 style="margin-bottom: 15px; background: none; padding: 0; border: none;">
+            <i class="fas fa-chart-bar me-2"></i>Résumé de la réception
+        </h5>
+        <div class="summary-grid">
+            <div class="summary-item">
+                <div class="value">@Model.LignesBon.Count</div>
+                <div class="label">Articles différents</div>
+            </div>
+            <div class="summary-item">
+                <div class="value">@Model.LignesBon.Sum(l => l.Quantite)</div>
+                <div class="label">Quantité totale</div>
+            </div>
+            <div class="summary-item">
+                <div class="value">@Model.CalculerTotal().ToString("C")</div>
+                <div class="label">Montant total</div>
+            </div>
+            <div class="summary-item">
+                <div class="value">@(Model.LignesBon.Any() ? (Model.CalculerTotal() / Model.LignesBon.Sum(l => l.Quantite)).ToString("C") : "0,00 €")</div>
+                <div class="label">Prix moyen</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signatures -->
+    <div style="margin-top: 50px;">
+        <div class="row">
+            <div class="col-6">
+                <div style="border: 1px solid #dee2e6; padding: 40px 20px; text-align: center; min-height: 100px;">
+                    <strong>Signature du fournisseur</strong>
+                    <br><br>
+                    <small>Date: ________________</small>
+                </div>
+            </div>
+            <div class="col-6">
+                <div style="border: 1px solid #dee2e6; padding: 40px 20px; text-align: center; min-height: 100px;">
+                    <strong>Signature du responsable réception</strong>
+                    <br><br>
+                    <small>Date: ________________</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pied de page -->
+    <div class="footer-info">
+        <div class="row">
+            <div class="col-6">
+                <p class="mb-1">Document généré automatiquement le @DateTime.Now.ToString("dd/MM/yyyy à HH:mm")</p>
+                <p class="mb-0">Système de gestion d'inventaire - Version 1.0</p>
+            </div>
+            <div class="col-6 text-end">
+                <p class="mb-1">BON D'ENTRÉE N° BE-@Model.Numero.ToString("D6")</p>
+                <p class="mb-0">Page 1/1</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-impression au chargement si demandé
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('autoprint') === 'true') {
+            window.onload = function() {
+                setTimeout(function() {
+                    window.print();
+                }, 1000);
+            };
+        }
+
+        // Fermer la fenêtre après impression
+        window.onafterprint = function() {
+            if (urlParams.get('autoclose') === 'true') {
+                window.close();
+            }
+        };
+    </script>
+</body>
+</html>

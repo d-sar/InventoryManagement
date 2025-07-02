@@ -1,0 +1,227 @@
+﻿@using InventoryManagementMVC.Models.Entities
+@using InventoryManagementMVC.Models.ViewModels
+@model IEnumerable<Bon>
+
+@{
+    ViewData["Title"] = "Bons d'Entrée Fournisseur";
+    var filter = ViewBag.Filter as BonEntreeFilterViewModel ?? new BonEntreeFilterViewModel();
+    var fournisseurs = ViewBag.Fournisseurs as List<Fournisseur> ?? new List<Fournisseur>();
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-truck-loading me-2"></i>Bons d'Entrée Fournisseur</h2>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="fas fa-plus me-1"></i>Nouveau Bon d'Entrée
+    </a>
+</div>
+
+<!-- Messages d'alerte -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- Filtres -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="fas fa-filter me-2"></i>Filtres
+            <button class="btn btn-sm btn-outline-secondary ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#filtersCollapse">
+                <i class="fas fa-chevron-down"></i>
+            </button>
+        </h5>
+    </div>
+    <div class="collapse show" id="filtersCollapse">
+        <div class="card-body">
+            <form method="get" asp-action="Index">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Fournisseur</label>
+                        <select name="FournisseurId" class="form-select">
+                            <option value="">Tous les fournisseurs</option>
+                            @foreach (var fournisseur in fournisseurs)
+                            {
+                                <option value="@fournisseur.Id" selected="@(filter.FournisseurId == fournisseur.Id)">
+                                    @fournisseur.Nom
+                                </option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Date début</label>
+                        <input type="date" name="DateDebut" class="form-control" value="@filter.DateDebut?.ToString("yyyy-MM-dd")" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Date fin</label>
+                        <input type="date" name="DateFin" class="form-control" value="@filter.DateFin?.ToString("yyyy-MM-dd")" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Numéro de bon</label>
+                        <input type="number" name="Numero" class="form-control" value="@filter.Numero" placeholder="Ex: 123" />
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary me-2">
+                            <i class="fas fa-search me-1"></i>Filtrer
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-1"></i>Réinitialiser
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Tableau des bons -->
+<div class="card">
+    <div class="card-body">
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th><i class="fas fa-hashtag me-1"></i>Numéro</th>
+                            <th><i class="fas fa-calendar me-1"></i>Date</th>
+                            <th><i class="fas fa-building me-1"></i>Fournisseur</th>
+                            <th><i class="fas fa-list me-1"></i>Nb Articles</th>
+                            <th><i class="fas fa-euro-sign me-1"></i>Total</th>
+                            <th><i class="fas fa-cogs me-1"></i>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var bon in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="badge bg-info">BE-@bon.Numero.ToString("D6")</span>
+                                </td>
+                                <td>@bon.Date.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-building text-muted me-2"></i>
+                                        <div>
+                                            <strong>@bon.Partenaire.Nom</strong>
+                                            @if (!string.IsNullOrEmpty(bon.Partenaire.Email))
+                                            {
+                                                <br>
+                                    
+                                                <small class="text-muted">@bon.Partenaire.Email</small>
+                                            }
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">@bon.LignesBon.Count article(s)</span>
+                                </td>
+                                <td>
+                                    <strong class="text-success">@bon.CalculerTotal().ToString("C")</strong>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a asp-action="Details" asp-route-id="@bon.IdBon"
+                                           class="btn btn-sm btn-info" title="Voir les détails">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a asp-action="ExportToPdf" asp-route-id="@bon.IdBon"
+                                           class="btn btn-sm btn-secondary" title="Exporter en PDF">
+                                            <i class="fas fa-file-pdf"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-danger"
+                                                onclick="confirmDelete(@bon.IdBon, 'BE-@bon.Numero.ToString("D6")')"
+                                                title="Supprimer">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Statistiques -->
+            <div class="mt-4 p-3 bg-light rounded">
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <h5 class="text-primary">@Model.Count()</h5>
+                        <small class="text-muted">Bons d'entrée</small>
+                    </div>
+                    <div class="col-md-4">
+                        <h5 class="text-success">@Model.Sum(b => b.CalculerTotal()).ToString("C")</h5>
+                        <small class="text-muted">Montant total</small>
+                    </div>
+                    <div class="col-md-4">
+                        <h5 class="text-info">@Model.Sum(b => b.LignesBon.Sum(l => l.Quantite))</h5>
+                        <small class="text-muted">Articles reçus</small>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">Aucun bon d'entrée trouvé</h5>
+                <p class="text-muted">Commencez par créer votre premier bon d'entrée.</p>
+                <a asp-action="Create" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>Créer un bon d'entrée
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Modal de confirmation de suppression -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer le bon d'entrée <strong id="bonNumero"></strong> ?</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Cette action réduira automatiquement le stock des produits concernés.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form id="deleteForm" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i>Supprimer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmDelete(bonId, bonNumero) {
+            document.getElementById('bonNumero').textContent = bonNumero;
+            document.getElementById('deleteForm').action = '@Url.Action("Delete")/' + bonId;
+
+            var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            deleteModal.show();
+        }
+    </script>
+}

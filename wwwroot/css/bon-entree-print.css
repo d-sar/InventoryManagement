@@ -1,0 +1,33 @@
+﻿body {
+    @media print {
+        .btn, .btn-group, .card-header, .modal {
+            display: none !important;
+        }
+
+        .card {
+            border: 1px solid #ddd !important;
+            box-shadow: none !important;
+        }
+
+        .table-responsive {
+            overflow: visible !important;
+        }
+
+        .page-break {
+            page-break-before: always;
+        }
+
+        body {
+            font-size: 12px;
+        }
+
+        h2, h5 {
+            color: #000 !important;
+        }
+    }
+
+
+}
+
+
+

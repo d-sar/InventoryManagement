@@ -17,6 +17,7 @@ builder.Services.AddScoped<IProduitService, ProduitService>();
 builder.Services.AddScoped<ICategorieService, CategorieService>();
 builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IFournisseurService, FournisseurService>();
+builder.Services.AddScoped<IBonEntreeService, BonEntreeService>();
 
 // Configuration MVC
 builder.Services.AddControllersWithViews();
