@@ -1,0 +1,382 @@
+﻿@model InventoryManagementMVC.Models.ViewModels.StockHistoryViewModel
+@{
+    ViewData["Title"] = "Fiche de Stock";
+    var query = Context.Request.Query;
+}
+
+<style>
+    .stock-header {
+        background: #f8f9fa;
+        color: #495057;
+        padding: 2rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+        border: 1px solid #dee2e6;
+    }
+
+    .search-form {
+        background: #f8f9fa;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 0.75rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+    .btn-search {
+        background: #007bff;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        color: white;
+        transition: background-color 0.2s;
+    }
+
+        .btn-search:hover {
+            background: #0056b3;
+            color: white;
+        }
+
+    .results-section {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-top: 2rem;
+    }
+
+    .results-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1.5rem;
+        margin-bottom: 0;
+    }
+
+    .stock-info {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .info-card {
+        background: white;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid #667eea;
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.25rem;
+    }
+
+    .info-value {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .table-responsive {
+        margin: 1.5rem;
+    }
+
+    .table-custom {
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+        .table-custom thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .table-custom th {
+            border: none;
+            padding: 1rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .table-custom td {
+            padding: 0.75rem;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+
+        .table-custom tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+    .stock-movement {
+        font-weight: 600;
+        border-radius: 4px;
+        padding: 0.25rem 0.5rem;
+    }
+
+    .stock-entry {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .stock-exit {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .stock-final {
+        background: #e7f3ff;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin: 1.5rem;
+        border: 2px solid #667eea;
+    }
+
+    .stock-final-value {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #667eea;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #6c757d;
+    }
+
+    .empty-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="stock-header">
+        <h2 class="mb-0">
+            <i class="fas fa-chart-line"></i> Fiche de Stock
+        </h2>
+        <p class="mb-0 mt-2">Consultez l'historique des mouvements de stock pour vos produits</p>
+    </div>
+
+    <!-- Formulaire de recherche -->
+    <div class="search-form">
+        <form method="get">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-box"></i> Produit
+                        </label>
+                        <select name="idProduit" class="form-control" required>
+                            <option value="">-- Choisir un produit --</option>
+                            @foreach (var produit in ViewBag.Produits)
+                            {
+                                <option value="@produit.IdProduit" selected="@(query["idProduit"] == produit.IdProduit.ToString() ? "selected" : null)">
+                                    @produit.Libelle
+                                </option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-calendar-alt"></i> Date de début
+                        </label>
+                        <input type="date" name="dateDebut" class="form-control" value="@query["dateDebut"]" required />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-calendar-alt"></i> Date de fin
+                        </label>
+                        <input type="date" name="dateFin" class="form-control" value="@query["dateFin"]" required />
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label class="form-label">&nbsp;</label>
+                        <button type="submit" class="btn btn-search form-control">
+                            <i class="fas fa-search"></i> Rechercher
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Résultat affiché seulement si historique disponible -->
+    @if (Model != null)
+    {
+        <div class="results-section">
+            <div class="results-header">
+                <h3 class="mb-0">
+                    <i class="fas fa-exchange-alt"></i> Mouvements de Stock
+                </h3>
+            </div>
+
+            <div class="stock-info">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="info-card">
+                            <div class="info-label">Période</div>
+                            <div class="info-value">
+                                Du @Model.DateDebut.ToString("dd/MM/yyyy") au @Model.DateFin.ToString("dd/MM/yyyy")
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="info-card">
+                            <div class="info-label">Article</div>
+                            <div class="info-value">@Model.Produit.Libelle</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="info-card">
+                            <div class="info-label">Stock Initial</div>
+                            <div class="info-value">@Model.StockInitial unités</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="info-card">
+                            <div class="info-label">Nombre de mouvements</div>
+                            <div class="info-value">@Model.Mouvements.Count() transaction(s)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @if (Model.Mouvements.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-custom">
+                        <thead>
+                            <tr>
+                                <th>N° Document</th>
+                                <th>Date</th>
+                                <th>Bon d'Entrée</th>
+                                <th>Retour Fournisseur</th>
+                                <th>Bon de Sortie</th>
+                                <th>Retour Client</th>
+                                <th>Stock</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int stock = Model.StockInitial;
+                                foreach (var mouvement in Model.Mouvements)
+                                {
+                                    var type = mouvement.Bon.DocType.Type?.ToUpper().Trim();
+                                    int quantite = mouvement.Quantite;
+                                    string be = "", rf = "", bs = "", rc = "";
+                                    string beClass = "", rfClass = "", bsClass = "", rcClass = "";
+
+                                    if (type == "ENTREE")
+                                    {
+                                        be = "+" + quantite;
+                                        stock += quantite;
+                                        beClass = "stock-entry";
+                                    }
+                                    else if (type == "RETOURFOURNISSEUR")
+                                    {
+                                        rf = "-" + quantite;
+                                        stock -= quantite;
+                                        rfClass = "stock-exit";
+                                    }
+                                    else if (type == "RETOURCLIENT")
+                                    {
+                                        rc = "+" + quantite;
+                                        stock += quantite;
+                                        rcClass = "stock-entry";
+                                    }
+                                    else if (type == "SORTIE")
+                                    {
+                                        bs = "-" + quantite;
+                                        stock -= quantite;
+                                        bsClass = "stock-exit";
+                                    }
+
+                                    string prefix = type switch
+                                    {
+                                        "ENTREE" => "BE",
+                                        "SORTIE" => "BS",
+                                        "RETOURFOURNISSEUR" => "RF",
+                                        "RETOURCLIENT" => "RC",
+                                        _ => "DOC"
+                                    };
+                                    <tr>
+                                        <td><strong>@($"{prefix}-{mouvement.Bon.Numero:D3}")</strong></td>
+                                        <td>@mouvement.Bon.Date.ToString("dd/MM/yyyy")</td>
+                                        <td><span class="stock-movement @beClass">@be</span></td>
+                                        <td><span class="stock-movement @rfClass">@rf</span></td>
+                                        <td><span class="stock-movement @bsClass">@bs</span></td>
+                                        <td><span class="stock-movement @rcClass">@rc</span></td>
+                                        <td><strong>@stock</strong></td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="stock-final">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h5 class="mb-0">Stock Final</h5>
+                            <small class="text-muted">Au @Model.DateFin.ToString("dd/MM/yyyy")</small>
+                        </div>
+                        <div class="col-md-4 text-right">
+                            <span class="stock-final-value">@stock unités</span>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <div class="empty-icon">📦</div>
+                    <h5>Aucun mouvement de stock</h5>
+                    <p>Aucun mouvement n'a été enregistré pour cette période.</p>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <div class="empty-icon">🔍</div>
+            <h5>Recherchez un historique de stock</h5>
+            <p>Sélectionnez un produit et une période pour afficher l'historique des mouvements.</p>
+        </div>
+    }
+</div>
+
+<!-- Font Awesome pour les icônes -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">

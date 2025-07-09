@@ -17,18 +17,20 @@ namespace InventoryManagementMVC.Data
         public DbSet<Bon> Bons { get; set; }
         public DbSet<DocType> DocTypes { get; set; }
         public DbSet<LigneBon> LigneBons { get; set; }
+        public DbSet<User> User { get; set; }
 
-        //public DbSet<BonEntree> BonsEntree { get; set; }
-        // public DbSet<BonRetourClient> BonsRetourClient { get; set; }
-        // public DbSet<BonRetourFournisseur> BonsRetourFournisseur { get; set; }
+   
         public DbSet<LigneBon> LignesBon { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
+     
+
             // Configuration TPH (Table Per Hierarchy) pour User
             modelBuilder.Entity<User>()
+                .ToTable("User")
                 .HasDiscriminator<string>("Type")
                 .HasValue<Client>("Client")
                 .HasValue<Fournisseur>("Fournisseur");
@@ -81,10 +83,6 @@ namespace InventoryManagementMVC.Data
 
             modelBuilder.Entity<Produit>()
                 .HasIndex(p => p.IdCategorie);
-
-
-
-
         }
     }
 }

@@ -2,10 +2,10 @@
 
 namespace InventoryManagementMVC.Models.ViewModels
 {
-    public class BonEntreeFilterViewModel
+    public class BonFilterViewModel
     {
-        [Display(Name = "Fournisseur")]
-        public int? FournisseurId { get; set; }
+        [Display(Name = "Partenaire")]
+        public int? PartenaireId { get; set; }
 
         [Display(Name = "Date début")]
         [DataType(DataType.Date)]
@@ -17,5 +17,7 @@ namespace InventoryManagementMVC.Models.ViewModels
 
         [Display(Name = "Numéro de bon")]
         public int? Numero { get; set; }
+
+        public string TypeBon { get; set; } = string.Empty;
     }
 }

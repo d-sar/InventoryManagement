@@ -52,10 +52,16 @@
                                 <i class="fas fa-file-alt"></i> Documents
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" asp-controller="Bon" asp-action="BonsSortie"><i class="fas fa-arrow-up"></i> Bons de sortie</a></li>
-                                <li><a class="dropdown-item" asp-controller="BonEntree" asp-action="Index"><i class="fas fa-arrow-down"></i> Bons d'entrée</a></li>
-                                <li><a class="dropdown-item" asp-controller="Bon" asp-action="BonsRetour"><i class="fas fa-undo"></i> Bons de retour</a></li>
+                                <li><a class="dropdown-item" asp-controller="Bon" asp-action="Index" asp-route-type="BS"><i class="fas fa-arrow-up"></i> Bons de sortie</a></li>
+                                <li><a class="dropdown-item" asp-controller="Bon" asp-action="Index" asp-route-type="BE"><i class="fas fa-arrow-down"></i> Bons d'entrée</a></li>
+                                <li><a class="dropdown-item" asp-controller="Bon" asp-action="Index" asp-route-type="BRF"><i class="fas fa-undo"></i> Bons de retour Fournisseaur</a></li>
+                                <li><a class="dropdown-item" asp-controller="Bon" asp-action="Index" asp-route-type="BRC"><i class="fas fa-undo"></i> Bons de retour Client</a></li>
                             </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="StockHistory" asp-action="Index">
+                                 Fiche de Stock
+                            </a>
                         </li>
                     </ul>
                 </div>

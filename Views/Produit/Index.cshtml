@@ -157,9 +157,7 @@
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <span class="me-2">@item.QuantiteStock</span>
-                                        <button class="btn btn-sm btn-outline-primary" onclick="updateStock(@item.IdProduit, @item.QuantiteStock)">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
+                                        
                                     </div>
                                 </td>
                                 <td>
@@ -184,9 +182,13 @@
                                         <a asp-action="Edit" asp-route-id="@item.IdProduit" class="btn btn-sm btn-outline-warning" title="Modifier">
                                             <i class="fas fa-edit"></i>
                                         </a>
+                                        <button class="btn btn-sm" onclick="fichedeStock(@item.IdProduit)">
+                                            <i class="fas fa-box"></i>
+                                        </button>
                                         <a asp-action="Delete" asp-route-id="@item.IdProduit" class="btn btn-sm btn-outline-danger" title="Supprimer">
                                             <i class="fas fa-trash"></i>
                                         </a>
+           
                                     </div>
                                 </td>
                             </tr>
@@ -269,6 +271,9 @@
             .catch(error => {
                 alert('Erreur lors de la mise à jour du stock');
             });
+        }
+        function fichedeStock(idProduit) {
+            window.location.href = '@Url.Action("Index", "StockHistory")?idProduit=' + idProduit;
         }
     </script>
 }

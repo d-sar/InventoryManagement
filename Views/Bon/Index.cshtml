@@ -1,0 +1,289 @@
+﻿@using InventoryManagementMVC.Models.ViewModels
+@model BonIndexViewModel
+
+@{
+    ViewData["Title"] = Model.TitrePage;
+    var config = new Dictionary<string, (string color, string bgColor, string prefix)>
+    {
+        { "BE", ("text-success", "bg-success", "BE") },
+        { "BS", ("text-danger", "bg-danger", "BS") },
+        { "BRF", ("text-warning", "bg-warning", "BRF") },
+        { "BRC", ("text-info", "bg-info", "BRC") }
+    };
+    var currentConfig = config.GetValueOrDefault(Model.TypeBon, ("text-primary", "bg-primary", "BON"));
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>
+        @if (Model.TypeBon == "BE")
+        {
+            <i class="fas fa-arrow-down me-2 text-success"></i>
+        }
+        else if (Model.TypeBon == "BS")
+        {
+            <i class="fas fa-arrow-up me-2 text-danger"></i>
+        }
+        else if (Model.TypeBon == "BRF" || Model.TypeBon == "BRC")
+        {
+            <i class="fas fa-undo me-2 text-warning"></i>
+        }
+        @Model.TitrePage
+    </h2>
+
+    <div class="btn-group me-3" role="group">
+        <a asp-action="Index" asp-route-type="BE" class="btn @(Model.TypeBon == "BE" ? "btn-success" : "btn-outline-success")">
+            <i class="fas fa-arrow-down"></i> Entrées
+        </a>
+        <a asp-action="Index" asp-route-type="BS" class="btn @(Model.TypeBon == "BS" ? "btn-danger" : "btn-outline-danger")">
+            <i class="fas fa-arrow-up"></i> Sorties
+        </a>
+        <a asp-action="Index" asp-route-type="BRF" class="btn @(Model.TypeBon == "BRF" ? "btn-warning" : "btn-outline-warning")">
+            <i class="fas fa-undo"></i> Ret. Fourn.
+        </a>
+        <a asp-action="Index" asp-route-type="BRC" class="btn @(Model.TypeBon == "BRC" ? "btn-info" : "btn-outline-info")">
+            <i class="fas fa-undo"></i> Ret. Client
+        </a>
+    </div>
+
+    <a asp-action="Create" asp-route-type="@Model.TypeBon" class="btn btn-primary">
+        <i class="fas fa-plus me-1"></i>Nouveau @(Model.TitrePage.TrimEnd('s'))
+    </a>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- Statistiques -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card @currentConfig.Item2 text-white stats-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="mb-0">@Model.Stats.NombreBons</h4>
+                        <small>@Model.TitrePage</small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-file-alt fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Montant total -->
+    <div class="col-md-3">
+        <div class="card border-success stats-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="mb-0 text-success">@Model.Stats.MontantTotal.ToString("C")</h4>
+                        <small class="text-muted">Montant total</small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-euro-sign fa-2x text-success opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Articles traités -->
+    <div class="col-md-3">
+        <div class="card border-info stats-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="mb-0 text-info">@Model.Stats.QuantiteTotale</h4>
+                        <small class="text-muted">Articles traités</small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-boxes fa-2x text-info opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Moyenne par bon -->
+    <div class="col-md-3">
+        <div class="card border-warning stats-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="mb-0 text-warning">@Model.Stats.MoyenneParBon.ToString("C")</h4>
+                        <small class="text-muted">Moyenne par bon</small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-chart-line fa-2x text-warning opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filtres -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="fas fa-filter me-2"></i>Filtres
+            <button class="btn btn-sm btn-outline-secondary ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#filtersCollapse">
+                <i class="fas fa-chevron-down"></i>
+            </button>
+        </h5>
+    </div>
+    <div class="collapse show" id="filtersCollapse">
+        <div class="card-body">
+            <form method="get" asp-action="Index">
+                <input type="hidden" name="type" value="@Model.TypeBon" />
+                <div class="row">
+                    <div class="col-md-3">
+                        <label asp-for="Filters.PartenaireId" class="form-label">@Model.TypePartenaire</label>
+                        <select asp-for="Filters.PartenaireId" class="form-select">
+                            <option value="">Tous les @Model.TypePartenaire.ToLower()s</option>
+                            @foreach (var partenaire in Model.Partenaires)
+                            {
+                                <option value="@partenaire.Id">@partenaire.Nom @partenaire.Nom</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label asp-for="Filters.DateDebut" class="form-label">Date début</label>
+                        <input asp-for="Filters.DateDebut" type="date" class="form-control" />
+                    </div>
+                    <div class="col-md-2">
+                        <label asp-for="Filters.DateFin" class="form-label">Date fin</label>
+                        <input asp-for="Filters.DateFin" type="date" class="form-control" />
+                    </div>
+                    <div class="col-md-2">
+                        <label asp-for="Filters.Numero" class="form-label">Numéro</label>
+                        <input asp-for="Filters.Numero" type="number" class="form-control" placeholder="N° du bon" />
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary me-2">
+                            <i class="fas fa-search"></i> Filtrer
+                        </button>
+                        <a asp-action="Index" asp-route-type="@Model.TypeBon" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i> Effacer
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Liste des bons -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="fas fa-list me-2"></i>Liste des @Model.TitrePage
+            <span class="badge @currentConfig.Item2 ms-2">@Model.Bons.Count</span>
+        </h5>
+    </div>
+    <div class="card-body p-0">
+        @if (Model.Bons.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>N° Bon</th>
+                            <th>Date</th>
+                            <th>@Model.TypePartenaire</th>
+                            <th>Articles</th>
+                            <th>Quantité</th>
+                            <th>Montant</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var bon in Model.Bons)
+                        {
+                            <tr>
+                                <td><span class="badge @currentConfig.Item2">@currentConfig.Item3-@bon.Numero.ToString("D4")</span></td>
+                                <td>@bon.Date.ToString("dd/MM/yyyy")</td>
+                                <td>@bon.Partenaire.Nom @bon.Partenaire.Nom</td>
+                                <td>@bon.LignesBon.Count</td>
+                                <td>@bon.LignesBon.Sum(l => l.Quantite)</td>
+                                <td>@bon.CalculerTotal().ToString("C")</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a asp-action="Details" asp-route-id="@bon.IdBon" asp-route-type="@Model.TypeBon" class="btn btn-sm btn-outline-primary btn-action">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a asp-action="ExportToPdf" asp-route-id="@bon.IdBon" asp-route-type="@Model.TypeBon" class="btn btn-sm btn-outline-success btn-action">
+                                            <i class="fas fa-file-pdf"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-outline-danger btn-action" onclick="confirmDelete(@bon.IdBon, '@currentConfig.Item3-@bon.Numero.ToString("D4")')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">Aucun @Model.TitrePage.ToLower() trouvé</h5>
+                <p class="text-muted">Commencez par créer votre premier @Model.TitrePage.TrimEnd('s').ToLower()</p>
+                <a asp-action="Create" asp-route-type="@Model.TypeBon" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>Nouveau @Model.TitrePage.TrimEnd('s')
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Modal de suppression -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer le bon <strong id="bonToDelete"></strong> ?</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Cette action modifiera les stocks et ne pourra pas être annulée.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form method="post" asp-action="Delete" id="deleteForm">
+                    <input type="hidden" name="id" id="deleteId" />
+                    <input type="hidden" name="type" value="@Model.TypeBon" />
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i>Supprimer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function confirmDelete(bonId, bonNumero) {
+        document.getElementById('deleteId').value = bonId;
+        document.getElementById('bonToDelete').textContent = bonNumero;
+        new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    }
+</script>

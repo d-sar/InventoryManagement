@@ -1,0 +1,49 @@
+﻿@model InventoryManagementMVC.Models.ViewModels.StockHistoryViewModel
+
+<h2>Historique du Stock</h2>
+
+<p>Du: @Model.DateDebut.ToShortDateString() &nbsp;&nbsp; À: @Model.DateFin.ToShortDateString()</p>
+<p>Article: @Model.Produit.Libelle</p>
+<p>Stock Initial: @Model.StockInitial</p>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Numéro document</th>
+            <th>Date</th>
+            <th>BE</th>
+            <th>RF</th>
+            <th>BS</th>
+            <th>RC</th>
+            <th>Stock</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int stock = Model.StockInitial;
+            foreach (var mouvement in Model.Mouvements)
+            {
+                var type = mouvement.Bon.DocType.Type?.ToUpper().Trim();
+                int quantite = mouvement.Quantite;
+                string be = "", rf = "", bs = "", rc = "";
+
+                if (type == "ENTREE") { be = "+" + quantite; stock += quantite; }
+                else if (type == "RETOURFOURNISSEUR") { rf = "-" + quantite; stock -= quantite; }
+                else if (type == "RETOURCLIENT") { rc = "+" + quantite; stock += quantite; }
+                else if (type == "SORTIE") { bs = "-" + quantite; stock -= quantite; }
+
+                <tr>
+                    <td>@mouvement.Bon.Numero</td>
+                    <td>@mouvement.Bon.Date.ToShortDateString()</td>
+                    <td>@be</td>
+                    <td>@rf</td>
+                    <td>@bs</td>
+                    <td>@rc</td>
+                    <td>@stock</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<p><strong>Stock Final: @stock</strong></p>

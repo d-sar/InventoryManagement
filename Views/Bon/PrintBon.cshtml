@@ -1,0 +1,335 @@
+﻿@model InventoryManagementMVC.Models.Entities.Bon
+
+@{
+    ViewData["Title"] = $"Impression - {ViewBag.TitrePage}";
+    Layout = null; // Pas de layout pour l'impression
+    var config = new Dictionary<string, (string color, string bgColor, string prefix, string icon, string title)>
+    {
+        { "BE", ("text-success", "bg-success", "BE", "fas fa-arrow-down", "BON D'ENTRÉE") },
+        { "BS", ("text-danger", "bg-danger", "BS", "fas fa-arrow-up", "BON DE SORTIE") },
+        { "BRF", ("text-warning", "bg-warning", "BRF", "fas fa-undo", "BON DE RETOUR FOURNISSEUR") },
+        { "BRC", ("text-info", "bg-info", "BRC", "fas fa-undo", "BON DE RETOUR CLIENT") }
+    };
+    var typeBon = (string)ViewBag.TypeBon ?? "";
+    var currentConfig = config.GetValueOrDefault(typeBon, ("text-primary", "bg-primary", "BON", "fas fa-file", "BON"));
+}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #333;
+        }
+        
+        .print-container {
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .company-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 15px;
+        }
+        
+        .company-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .company-info {
+            font-size: 11px;
+            color: #666;
+        }
+        
+        .bon-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 20px 0;
+            padding: 10px;
+            border: 2px solid #333;
+            background-color: #f8f9fa;
+        }
+        
+        .bon-info {
+            margin-bottom: 20px;
+        }
+        
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .info-table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            font-size: 11px;
+        }
+        
+        .info-table .label {
+            font-weight: bold;
+            background-color: #f8f9fa;
+            width: 30%;
+        }
+        
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .details-table th,
+        .details-table td {
+            padding: 8px;
+            border: 1px solid #333;
+            text-align: left;
+            font-size: 11px;
+        }
+        
+        .details-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .details-table .text-center {
+            text-align: center;
+        }
+        
+        .details-table .text-right {
+            text-align: right;
+        }
+        
+        .total-row {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        
+        .signature-section {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .signature-box {
+            width: 200px;
+            text-align: center;
+        }
+        
+        .signature-line {
+            border-top: 1px solid #333;
+            margin-top: 40px;
+            padding-top: 5px;
+            font-size: 10px;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 10px;
+            color: #666;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+        
+        
+        }
+    </style>
+</head>
+<body>
+    <div class="print-actions no-print">
+        <button onclick="window.print()" class="btn btn-primary me-2">
+            <i class="fas fa-print"></i> Imprimer
+        </button>
+        <button onclick="window.close()" class="btn btn-secondary">
+            <i class="fas fa-times"></i> Fermer
+        </button>
+    </div>
+
+    <div class="print-container">
+        <!-- En-tête de l'entreprise -->
+        <div class="company-header">
+            <div class="company-name">VOTRE ENTREPRISE</div>
+            <div class="company-info">
+                Adresse de l'entreprise | Téléphone | Email<br>
+                SIRET : 123 456 789 00012 | TVA : FR12345678901
+            </div>
+        </div>
+
+        <!-- Titre du bon -->
+        <div class="bon-title">
+            @currentConfig.Item5
+            <br>
+            <span style="font-size: 14px;">N° @currentConfig.Item3-@Model.Numero.ToString("D4")</span>
+        </div>
+
+        <!-- Informations du bon -->
+        <div class="row">
+            <div class="col-6">
+                <table class="info-table">
+                    <tr>
+                        <td class="label">Date :</td>
+                        <td>@Model.Date.ToString("dd/MM/yyyy")</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Numéro :</td>
+                        <td>@currentConfig.Item3-@Model.Numero.ToString("D4")</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Type :</td>
+                        <td>@currentConfig.Item5</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-6">
+                <table class="info-table">
+                    <tr>
+                        <td class="label">Partenaire :</td>
+                        <td><strong>@Model.Partenaire.Nom @Model.Partenaire.Nom</strong></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Type partenaire :</td>
+                        <td>@Model.Partenaire.Type</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Heure :</td>
+                        <td>@DateTime.Now.ToString("HH:mm")</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Détails des articles -->
+        <table class="details-table">
+            <thead>
+                <tr>
+                    <th style="width: 5%;">N°</th>
+                    <th style="width: 40%;">Article</th>
+                    <th style="width: 15%;">Catégorie</th>
+                    <th style="width: 10%;">Qté</th>
+                    <th style="width: 15%;">Prix unitaire</th>
+                    <th style="width: 15%;">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int numeroLigne = 1;
+                }
+                @foreach (var ligne in Model.LignesBon)
+                {
+                    <tr>
+                        <td class="text-center">@numeroLigne</td>
+                        <td>
+                            <strong>@ligne.Produit.Libelle</strong>
+                            @if (!string.IsNullOrEmpty(ligne.Produit.Description))
+                            {
+                                <br><small style="color: #666;">@ligne.Produit.Description</small>
+                            }
+                        </td>
+                        <td>@ligne.Produit.Categorie.Nom</td>
+                        <td class="text-center">@ligne.Quantite</td>
+                        <td class="text-right">@ligne.PrixUnitaire.ToString("C")</td>
+                        <td class="text-right">@((ligne.Quantite * ligne.PrixUnitaire).ToString("C"))</td>
+                    </tr>
+                    numeroLigne++;
+                }
+            </tbody>
+            <tfoot>
+                <tr class="total-row">
+                    <td colspan="3" class="text-right"><strong>TOTAL GÉNÉRAL :</strong></td>
+                    <td class="text-center"><strong>@Model.LignesBon.Sum(l => l.Quantite)</strong></td>
+                    <td></td>
+                    <td class="text-right"><strong>@Model.CalculerTotal().ToString("C")</strong></td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <!-- Résumé -->
+        <div class="row" style="margin-top: 20px;">
+            <div class="col-12">
+                <table class="info-table">
+                    <tr>
+                        <td class="label">Nombre d'articles différents :</td>
+                        <td>@Model.LignesBon.Count</td>
+                        <td class="label">Quantité totale :</td>
+                        <td>@Model.LignesBon.Sum(l => l.Quantite)</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Montant HT :</td>
+                        <td>@Model.CalculerTotal().ToString("C")</td>
+                        <td class="label">Montant TTC :</td>
+                        <td>@Model.CalculerTotal().ToString("C")</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Section signatures -->
+        <div class="signature-section">
+            <div class="signature-box">
+                <div style="margin-bottom: 10px;"><strong>Responsable magasin</strong></div>
+                <div class="signature-line">Signature et cachet</div>
+            </div>
+            <div class="signature-box">
+                <div style="margin-bottom: 10px;"><strong>@(Model.Partenaire.Type)</strong></div>
+                <div class="signature-line">Signature</div>
+            </div>
+        </div>
+
+        <!-- Observations -->
+        <div style="margin-top: 30px;">
+            <table class="info-table">
+                <tr>
+                    <td class="label" style="width: 15%;">Observations :</td>
+                    <td style="height: 60px; vertical-align: top;"></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Pied de page -->
+        <div class="footer">
+            <p>
+                Document généré le @DateTime.Now.ToString("dd/MM/yyyy à HH:mm") | 
+                @currentConfig.Item5 N° @currentConfig.Item3-@Model.Numero.ToString("D4")
+            </p>
+            <p style="margin-top: 10px; font-size: 9px;">
+                Ce document est généré automatiquement par le système de gestion d'inventaire.
+            </p>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-print si demandé
+        if (window.location.search.includes('autoprint=true')) {
+            window.onload = function() {
+                setTimeout(function() {
+                    window.print();
+                }, 1000);
+            };
+        }
+
+        // Fermer automatiquement après impression
+        window.addEventListener('afterprint', function() {
+            if (window.location.search.includes('autoclose=true')) {
+                window.close();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,288 @@
+﻿@model InventoryManagementMVC.Models.Entities.Bon
+
+@{
+    string key = ViewBag.TypeBon?.ToString() ?? "";
+    var config = new Dictionary<string, (string color, string bgColor, string prefix, string icon)>
+    {
+        { "BE", ("text-success", "bg-success", "BE", "fas fa-arrow-down") },
+        { "BS", ("text-danger", "bg-danger", "BS", "fas fa-arrow-up") },
+        { "BRF", ("text-warning", "bg-warning", "BRF", "fas fa-undo") },
+        { "BRC", ("text-info", "bg-info", "BRC", "fas fa-undo") }
+    };
+    (string color, string bgColor, string prefix, string icon) currentConfig;
+    if (!config.TryGetValue(key, out currentConfig))
+    {
+        currentConfig = ("text-primary", "bg-primary", "BON", "fas fa-file");
+    }
+}
+
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>
+        <i class="@currentConfig.Item4 me-2 @currentConfig.Item1"></i>
+        @ViewBag.TitrePage
+    </h2>
+    <div>
+        <a asp-action="Index" asp-route-type="@ViewBag.TypeBon" class="btn btn-outline-secondary me-2">
+            <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+        </a>
+        <a asp-action="ExportToPdf" asp-route-id="@Model.IdBon" asp-route-type="@ViewBag.TypeBon" class="btn btn-outline-success me-2">
+            <i class="fas fa-file-pdf me-1"></i>Imprimer
+        </a>
+        <button type="button" class="btn btn-outline-danger" onclick="confirmDelete(@Model.IdBon, '@currentConfig.Item3-@Model.Numero.ToString("D4")')">
+            <i class="fas fa-trash me-1"></i>Supprimer
+        </button>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="row">
+    <!-- Informations générales -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header @currentConfig.Item2 text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>Informations générales
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-sm-4">
+                        <strong>Numéro :</strong>
+                    </div>
+                    <div class="col-sm-8">
+                        <span class="badge @currentConfig.Item2">@currentConfig.Item3-@Model.Numero.ToString("D4")</span>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4">
+                        <strong>Date :</strong>
+                    </div>
+                    <div class="col-sm-8">
+                        @Model.Date.ToString("dd/MM/yyyy")
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4">
+                        <strong>Partenaire :</strong>
+                    </div>
+                    <div class="col-sm-8">
+                        @Model.Partenaire.Nom
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4">
+                        <strong>Type :</strong>
+                    </div>
+                    <div class="col-sm-8">
+                        <i class="@currentConfig.Item4 me-1"></i>@ViewBag.TitrePage
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4">
+                        <strong>Créé le :</strong>
+                    </div>
+                    <div class="col-sm-8">
+                        @Model.Date.ToString("dd/MM/yyyy HH:mm")
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Résumé -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-calculator me-2"></i>Résumé
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-12 mb-3">
+                        <h4 class="mb-1 text-info">@Model.LignesBon.Count</h4>
+                        <small class="text-muted">Articles différents</small>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <h4 class="mb-1 text-warning">@Model.LignesBon.Sum(l => l.Quantite)</h4>
+                        <small class="text-muted">Quantité totale</small>
+                    </div>
+                    <div class="col-12">
+                        <h4 class="mb-1 text-success">@Model.CalculerTotal()</h4>
+                        <small class="text-muted">Montant total</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Détails des articles -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-boxes me-2"></i>Détails des articles
+                    <span class="badge bg-secondary ms-2">@Model.LignesBon.Count</span>
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Article</th>
+                                <th>Catégorie</th>
+                                <th class="text-center">Quantité</th>
+                                <th class="text-end">Prix unitaire</th>
+                                <th class="text-end">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var ligne in Model.LignesBon)
+                            {
+                                <tr>
+                                    <td>
+                                        <strong>@ligne.Produit.Libelle</strong>
+                                        @if (!string.IsNullOrEmpty(ligne.Produit.Description))
+                                        {
+                                            <br>
+                                    
+                                            <small class="text-muted">@ligne.Produit.Description</small>
+                                        }
+                                    </td>
+                                    <td>@ligne.Produit.Categorie.Nom</td>
+                                    <td class="text-center">
+                                        <span class="badge bg-light text-dark">@ligne.Quantite</span>
+                                    </td>
+                                    <td class="text-end">@ligne.PrixUnitaire</td>
+                                    <td class="text-end">
+                                        <strong>@((ligne.Quantite * ligne.PrixUnitaire))</strong>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot class="table-light">
+                            <tr>
+                                <th colspan="4" class="text-end">Total général :</th>
+                                <th class="text-end">@Model.CalculerTotal()</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Historique/Actions -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-history me-2"></i>Actions disponibles
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="d-grid">
+                            <a asp-action="ExportToPdf" asp-route-id="@Model.IdBon" asp-route-type="@ViewBag.TypeBon" class="btn btn-outline-success">
+                                <i class="fas fa-file-pdf me-2"></i>Exporter en PDF
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-grid">
+                            <button type="button" class="btn btn-outline-primary" onclick="window.print()">
+                                <i class="fas fa-print me-2"></i>Imprimer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de suppression -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer le bon <strong id="bonToDelete"></strong> ?</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Cette action modifiera les stocks et ne pourra pas être annulée.
+                </div>
+                <div class="alert alert-info">
+                    <strong>Détails du bon :</strong>
+                    <ul class="mb-0">
+                        <li>Date : @Model.Date.ToString("dd/MM/yyyy")</li>
+                        <li>Partenaire : @Model.Partenaire.Nom @Model.Partenaire.Nom</li>
+                        <li>Articles : @Model.LignesBon.Count</li>
+                        <li>Montant : @Model.CalculerTotal().ToString("C")</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form method="post" asp-action="Delete" id="deleteForm">
+                    <input type="hidden" name="id" id="deleteId" />
+                    <input type="hidden" name="type" value="@ViewBag.TypeBon" />
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i>Supprimer définitivement
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function confirmDelete(bonId, bonNumero) {
+        document.getElementById('deleteId').value = bonId;
+        document.getElementById('bonToDelete').textContent = bonNumero;
+        new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    }
+
+    // Améliorer l'impression
+    window.addEventListener('beforeprint', function() {
+        document.querySelector('.btn-group').style.display = 'none';
+        document.querySelector('.d-flex.justify-content-between').style.display = 'none';
+    });
+
+    window.addEventListener('afterprint', function() {
+        document.querySelector('.btn-group').style.display = 'block';
+        document.querySelector('.d-flex.justify-content-between').style.display = 'flex';
+    });
+</script>
+
+<style>
+   
+
+    .card {
+        border: 1px solid #dee2e6 !important;
+        page-break-inside: avoid;
+    }
+
+    .alert {
+        display: none !important;
+    }
+
+    }
+</style>

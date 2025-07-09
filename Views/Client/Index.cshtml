@@ -163,11 +163,7 @@
                                                    class="btn btn-warning btn-sm" title="Modifier">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
-                                                <button type="button" class="btn btn-sm @(item.EstActif ? "btn-secondary" : "btn-success")"
-                                                        onclick="toggleClientStatus(@item.Id, @item.EstActif.ToString().ToLower())"
-                                                        title="@(item.EstActif ? "Désactiver" : "Activer")">
-                                                    <i class="fas fa-@(item.EstActif ? "toggle-off" : "toggle-on")"></i>
-                                                </button>
+                                            
                                                 <a asp-action="Delete" asp-route-id="@item.Id"
                                                    class="btn btn-danger btn-sm" title="Supprimer">
                                                     <i class="fas fa-trash"></i>

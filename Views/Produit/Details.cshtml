@@ -211,10 +211,10 @@
             });
         }
 
-        function createBonSortie(produitId) {
-            // Rediriger vers la création d'un bon de sortie avec ce produit
-            window.location.href = '@Url.Action("Create", "Bon")?type=sortie&produitId=' + produitId;
-        }
+                function createBonSortie(produitId) {
+                    // Rediriger vers la création d'un bon de sortie avec ce produit
+                    window.location.href = '@Url.Action("Create", "Bon")?type=sortie&produitId=' + produitId;
+                }
 
         function createBonEntree(produitId) {
             // Rediriger vers la création d'un bon d'entrée avec ce produit
