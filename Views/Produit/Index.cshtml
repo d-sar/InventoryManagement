@@ -272,8 +272,13 @@
                 alert('Erreur lors de la mise à jour du stock');
             });
         }
+        
         function fichedeStock(idProduit) {
-            window.location.href = '@Url.Action("Index", "StockHistory")?idProduit=' + idProduit;
+            const dateAujourdhui = new Date().toISOString().split('T')[0]; // Format YYYY-MM-DD
+            const dateDebut = dateAujourdhui
+            const dateFin =  new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0];
+
+            window.location.href = '@Url.Action("Index", "StockHistory")?idProduit=' + idProduit + '&dateDebut=' + dateDebut + '&dateFin=' + dateFin;
         }
     </script>
 }

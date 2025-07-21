@@ -45,6 +45,14 @@ les besoins fonctionnels
 - La quantité en stock ne peut pas être négative.
 
 
+(designe 
+page acueil
+routour a la liste des produits dans fiche de stock
+modifier contacts par partenaire 
+modifier  et supprimer dans client 
+details dans fournisseurs  et recherche 
+Articles traites = LA QUANTITE dans bon )
+
 
 
 

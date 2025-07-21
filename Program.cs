@@ -19,6 +19,8 @@ builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IFournisseurService, FournisseurService>();
 builder.Services.AddScoped<IBonService, BonService>();
 builder.Services.AddScoped<StockHistoryService>();
+builder.Services.AddScoped<StockGlobalService>();
+builder.Services.AddScoped<StockValoriseService>();
 
 // Configuration MVC
 builder.Services.AddControllersWithViews();

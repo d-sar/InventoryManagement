@@ -1,18 +1,45 @@
-﻿<!-- Views/Produit/Index.cshtml -->
-@model IEnumerable<InventoryManagementMVC.Models.ViewModels.ProduitViewModel>
-@{
-    ViewData["Title"] = "Gestion des Produits";
+﻿@{
+    ViewData["Title"] = "Accueil";
 }
+<link rel="stylesheet" href="~/css/Home.css" />
 
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2"><i class="fas fa-box me-2"></i>Gestion des Produits</h1>
-    <div class="btn-toolbar mb-2 mb-md-0">
-        <button class="btn btn-gradient me-2" onclick="showCreateModal()">
-            <i class="fas fa-plus me-1"></i>Nouveau Produit
-        </button>
-        <button class="btn btn-outline-warning" onclick="loadStockFaible()">
-            <i class="fas fa-exclamation-triangle me-1"></i>Stock Faible
-        </button>
+<div class="hero">
+    <h1><i class="fas fa-boxes"></i> Bienvenue dans la Plateforme de Gestion de Stock</h1>
+    <p>
+        Suivez, gérez et optimisez votre inventaire avec une solution moderne, intuitive et performante.
+    </p>
+    <div>
+        <a asp-controller="Produit" asp-action="Index" class="btn btn-blue">
+            <i class="fas fa-box"></i> Gérer les Produits
+        </a>
+        <a asp-controller="Bon" asp-action="Index" class="btn btn-outline-light">
+            <i class="fas fa-file-alt"></i> Voir les Bons
+        </a>
     </div>
 </div>
-
+<div class="features container">
+    <h2>Fonctionnalités Clés</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-4 d-flex">
+            <div class="feature-box w-100 text-center">
+                <i class="fas fa-warehouse"></i>
+                <h4>Stock en Temps Réel</h4>
+                <p>Consultez les niveaux de stock et mouvements en direct pour une meilleure prise de décision.</p>
+            </div>
+        </div>
+        <div class="col-md-4 d-flex">
+            <div class="feature-box w-100 text-center">
+                <i class="fas fa-truck"></i>
+                <h4>Suivi des Fournisseurs</h4>
+                <p>Gérez les livraisons, les retours et les historiques de transactions avec vos partenaires.</p>
+            </div>
+        </div>
+        <div class="col-md-4 d-flex">
+            <div class="feature-box w-100 text-center">
+                <i class="fas fa-chart-line"></i>
+                <h4>Tableaux de Bord</h4>
+                <p>Visualisez les performances, les tendances et optimisez votre chaîne d’approvisionnement.</p>
+            </div>
+        </div>
+    </div>
+</div>

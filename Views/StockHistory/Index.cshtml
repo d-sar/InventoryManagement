@@ -5,6 +5,19 @@
 }
 
 <style>
+    .stock-fiche-container {
+        min-height: 100vh;
+        padding: 20px 0;
+    }
+
+    .content-wrapper {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        padding: 30px;
+        margin: 20px auto;
+        max-width: 1400px;
+    }
     .stock-header {
         background: #f8f9fa;
         color: #495057;
@@ -16,10 +29,10 @@
 
     .search-form {
         background: #f8f9fa;
-        padding: 2rem;
+        padding: 20px;
         border-radius: 10px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        margin-bottom: 2rem;
+        margin-bottom: 30px;
+        border-left: 4px solid #007bff;
     }
 
     .form-group {
@@ -67,12 +80,7 @@
         margin-top: 2rem;
     }
 
-    .results-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 1.5rem;
-        margin-bottom: 0;
-    }
+   
 
     .stock-info {
         background: #f8f9fa;
@@ -85,7 +93,7 @@
         border-radius: 8px;
         padding: 1rem;
         margin-bottom: 1rem;
-        border-left: 4px solid #667eea;
+        border-left: 4px solid #007bff;
     }
 
     .info-label {
@@ -110,7 +118,7 @@
     }
 
         .table-custom thead {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(#000000);
             color: white;
         }
 
@@ -152,13 +160,13 @@
         padding: 1.5rem;
         border-radius: 8px;
         margin: 1.5rem;
-        border: 2px solid #667eea;
+        border: 2px solid #005792;
     }
 
     .stock-final-value {
         font-size: 1.2rem;
         font-weight: 700;
-        color: #667eea;
+        color: #005792;
     }
 
     .empty-state {
@@ -172,16 +180,31 @@
         margin-bottom: 1rem;
     }
 
+    .page-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 3px solid #007bff;
+    }
+
+        .page-header h1 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+        }
 
     }
 </style>
 
-<div class="container-fluid">
-    <div class="stock-header">
-        <h2 class="mb-0">
-            <i class="fas fa-chart-line"></i> Fiche de Stock
-        </h2>
-        <p class="mb-0 mt-2">Consultez l'historique des mouvements de stock pour vos produits</p>
+<div class="stock-fiche-container">
+    <div class="content-wrapper">
+    <button class="btn btn-outline-info" onclick="listedeProduits()">
+        Retour à la liste
+    </button>
+    <div class="page-header">
+        <h1><i class="fas fa-chart-bar"></i>Fiche de Stock</h1>
+        <p class="subtitle">Vue d'ensemble des stocks de tous les produits</p>
     </div>
 
     <!-- Formulaire de recherche -->
@@ -224,7 +247,7 @@
                     <div class="form-group">
                         <label class="form-label">&nbsp;</label>
                         <button type="submit" class="btn btn-search form-control">
-                            <i class="fas fa-search"></i> Rechercher
+                                <i class="fas fa-search"></i> Filtrer
                         </button>
                     </div>
                 </div>
@@ -236,12 +259,6 @@
     @if (Model != null)
     {
         <div class="results-section">
-            <div class="results-header">
-                <h3 class="mb-0">
-                    <i class="fas fa-exchange-alt"></i> Mouvements de Stock
-                </h3>
-            </div>
-
             <div class="stock-info">
                 <div class="row">
                     <div class="col-md-3">
@@ -272,6 +289,7 @@
                     </div>
                 </div>
             </div>
+            
 
             @if (Model.Mouvements.Any())
             {
@@ -332,13 +350,15 @@
                                         _ => "DOC"
                                     };
                                     <tr>
-                                        <td><strong>@($"{prefix}-{mouvement.Bon.Numero:D3}")</strong></td>
+                                        <td><strong>@($"{prefix}-{mouvement.Bon.Numero:D4}")</strong></td>
                                         <td>@mouvement.Bon.Date.ToString("dd/MM/yyyy")</td>
                                         <td><span class="stock-movement @beClass">@be</span></td>
                                         <td><span class="stock-movement @rfClass">@rf</span></td>
                                         <td><span class="stock-movement @bsClass">@bs</span></td>
                                         <td><span class="stock-movement @rcClass">@rc</span></td>
                                         <td><strong>@stock</strong></td>
+                                        <td>
+                                        </td>
                                     </tr>
                                 }
                             }
@@ -361,7 +381,7 @@
             else
             {
                 <div class="empty-state">
-                    <div class="empty-icon">📦</div>
+                    <div class="empty-icon"></div>
                     <h5>Aucun mouvement de stock</h5>
                     <p>Aucun mouvement n'a été enregistré pour cette période.</p>
                 </div>
@@ -371,12 +391,20 @@
     else
     {
         <div class="empty-state">
-            <div class="empty-icon">🔍</div>
+            <div class="empty-icon"></div>
             <h5>Recherchez un historique de stock</h5>
             <p>Sélectionnez un produit et une période pour afficher l'historique des mouvements.</p>
         </div>
     }
 </div>
+</div>
+<script>
+    function listedeProduits() {
+        // Rediriger vers la liste des produits
+        window.location.href = '@Url.Action("Index", "Produit")';
+    }
+</script>
+
 
 <!-- Font Awesome pour les icônes -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">

@@ -1,0 +1,67 @@
+@startuml
+' Définition des classes
+
+abstract class Partenaire {
+  - id: int
+  - nom: String
+  - adresse: String
+  - telephone: String
+  - email: String
+  - type: String
+  + creerBon()
+}
+
+class Client
+class Fournisseur
+
+class Produit {
+  - idProduit: int
+  - idCategorie: int <<FK>>
+  - libelle: String
+  - description: String
+  - prixUnitaire: double
+  - quantiteStock: int
+}
+
+class Categorie {
+  - idCategorie: int
+  - nom: String
+  - description: String
+}
+
+abstract class Bon {
+  # idBon: int
+  # idPartenaire: int <<FK>>
+  # idDocType: int <<FK>>
+  # numero: int
+  # date: Date
+  + calculerTotal(): double
+}
+
+class docType {
+  - idDocType: int
+  - type: String
+  - titre : String 
+}
+
+class LigneBon {
+  - idLigne: int
+  - idBon: int <<FK>>
+  - idProduit: int
+  - quantite: int
+  - prixUnitaire: double
+}
+
+' Héritage
+Client --|> Partenaire
+Fournisseur --|> Partenaire
+
+' Associations
+Partenaire "1" -- "1..*" Bon : émet
+docType "1" -- "0..*" Bon : classifie
+
+Bon "1" *-- "1..*" LigneBon : contient
+Produit "1" -- "0..*" LigneBon : référence
+Categorie "1" -- "0..*" Produit : classifie
+
+@enduml

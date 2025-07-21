@@ -32,8 +32,7 @@
                             <th>@Html.DisplayNameFor(model => model.Nom)</th>
                             <th>@Html.DisplayNameFor(model => model.Email)</th>
                             <th>@Html.DisplayNameFor(model => model.Telephone)</th>
-                            <th>@Html.DisplayNameFor(model => model.NombreLivraisons)</th>
-                            <th>@Html.DisplayNameFor(model => model.TotalFournitures)</th>
+                            
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -56,10 +55,13 @@
                                         <a href="tel:@item.Telephone">@item.Telephone</a>
                                     }
                                 </td>
-                                <td>@item.NombreLivraisons</td>
-                                <td>@item.TotalFournitures.ToString("C")</td>
+                               
                                 <td>
                                     <div class="btn-group btn-group-sm">
+                                        <a asp-action="Details" asp-route-id="@item.Id"
+                                           class="btn btn-info btn-sm" title="Détails">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
                                         <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">
                                             <i class="fas fa-edit"></i>
                                         </a>

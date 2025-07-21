@@ -1,0 +1,40 @@
+﻿@model InventoryManagementMVC.Models.ViewModels.ClientViewModel
+
+@{
+    ViewData["Title"] = "Supprimer Client";
+}
+
+<div class="container-fluid">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 bg-danger text-white">
+            <h6 class="m-0 font-weight-bold">
+                <i class="fas fa-trash-alt mr-2"></i>@ViewData["Title"]
+            </h6>
+        </div>
+        <div class="card-body">
+            <h4 class="text-danger">Êtes-vous sûr de vouloir supprimer ce fournisseur ?</h4>
+            <hr />
+
+            <dl class="row">
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Nom)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Nom)</dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Email)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Email)</dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.TotalAchats)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.TotalAchats)</dd>
+            </dl>
+
+            <form asp-action="Delete">
+                <input type="hidden" asp-for="Id" />
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash mr-1"></i>Supprimer
+                </button>
+                <a asp-action="Index" class="btn btn-secondary ml-2">
+                    <i class="fas fa-times mr-1"></i>Annuler
+                </a>
+            </form>
+        </div>
+    </div>
+</div>

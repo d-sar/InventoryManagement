@@ -1,0 +1,187 @@
+﻿@model InventoryManagementMVC.Models.ViewModels.StockValoriseViewModel
+@{
+    ViewData["Title"] = "Détails du Stock Valorisé - " + Model.Libelle;
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<link  rel="stylesheet" href="~/css/StockValoriseDetails.css"/>
+
+<div class="details-container">
+    <div class="content-wrapper">
+        <!-- Navigation -->
+        <div class="breadcrumb-nav">
+            <i class="fas fa-home"></i>
+            <a href="@Url.Action("Index")">Stock Valorisé</a>
+            <i class="fas fa-chevron-right mx-2"></i>
+            Détails du produit
+        </div>
+
+        <!-- En-tête de page -->
+        <div class="page-header">
+            <h1><i class="fas fa-cube"></i> Détails du Stock Valorisé</h1>
+            <p class="subtitle">Analyse détaillée du stock et des mouvements</p>
+        </div>
+
+        <!-- Informations du produit -->
+        <div class="product-info">
+            <h2>@Model.Libelle</h2>
+            <div class="category">
+                <i class="fas fa-tag"></i> @Model.Categorie
+            </div>
+        </div>
+
+        <!-- Date de calcul
+        <div class="date-info">
+            <i class="fas fa-calendar-check"></i>
+            <strong>Date de calcul :</strong> @Model.DateCalcul.ToString("dd/MM/yyyy à HH:mm")
+        </div>-->
+
+        <!-- Statistiques principales -->
+        <div class="stats-grid">
+            <div class="stat-card entrees">
+                <div class="stat-value positive-value">@Model.SumQuantiteEntrees</div>
+                <div class="stat-label"><strong>Quantité Entrées</strong></div>
+            </div>
+            <div class="stat-card sorties">
+                <div class="stat-value negative-value">@Model.SumSorties</div>
+                <div class="stat-label"><strong>Quantité Sorties</strong></div>
+            </div>
+            <div class="stat-card stock-physique">
+                <div class="stat-value" style="color: #f39c12;">@Model.StockPhysique</div>
+                <div class="stat-label"><strong>Stock Physique</strong></div>
+            </div>
+            <div class="stat-card pmp">
+                <div class="stat-value" style="color: #8e44ad;">@Model.PMP.ToString("N2")</div>
+                <div class="stat-label"><strong>PMP (DH)</strong></div>
+            </div>
+            <!-- 
+            <div class="stat-card stock-valorise">
+                <div class="stat-value" style="color: #d35400;">@Model.StockValorise.ToString("N2")</div>
+                <div class="stat-label"><strong>Stock Valorisé (DH)</strong></div>
+            </div>-->
+        </div>
+
+        <!-- Résumé des calculs -->
+        <div class="summary-section">
+            <h4><i class="fas fa-calculator"></i> Résumé des Calculs</h4>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="value">@Model.SumPrixUnitaire.ToString("N2")</div>
+                    <div class="label">Montant Total Entrées</div>
+                </div>
+                <div class="summary-item">
+                    <div class="value">@((Model.SumQuantiteEntrees - Model.SumSorties))</div>
+                    <div class="label">Stock Calculé</div>
+                </div>
+                <div class="summary-item">
+                    <div class="value">@Model.MouvementsEntrees.Count</div>
+                    <div class="label">Mouvements d'Entrée</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Détail des mouvements d'entrée -->
+        <div class="movements-section">
+            <h4><i class="fas fa-exchange-alt"></i> Détail des Mouvements d'Entrée</h4>
+
+            @if (Model.MouvementsEntrees.Any())
+            {
+                <div class="table-container">
+                    <table class="table table-custom">
+                        <thead>
+                            <tr>
+                                <th>N° Bon</th>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Quantité</th>
+                                <th>Prix Unitaire</th>
+                                <th>Montant Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var mouvement in Model.MouvementsEntrees.OrderByDescending(m => m.DateBon))
+                            {
+                                var type = mouvement.TypeDoc?.ToUpper().Trim();
+                                string prefix = type switch
+                                {
+                                    "ENTREE" => "BE",
+                                    "SORTIE" => "BS",
+                                    "RETOURFOURNISSEUR" => "RF",
+                                    "RETOURCLIENT" => "RC",
+                                    _ => "DOC"
+                                };
+                                var numeroFormatte = mouvement.NumeroBon.ToString().PadLeft(4, '0');
+                                <tr>
+                                    <td><strong>@($"{prefix}-{numeroFormatte}")</strong></td>
+                                    <td>@mouvement.DateBon.ToString("dd/MM/yyyy")</td>
+                                    <td>
+                                        <span class="type-badge @mouvement.TypeDoc.ToLower()">
+                                            @mouvement.TypeDoc
+                                        </span>
+                                    </td>
+                                    <td class="positive-value">@mouvement.Quantite</td>
+                                    <td class="montant-value">@mouvement.PrixUnitaire.ToString("N2")</td>
+                                    <td class="montant-value">@mouvement.MontantTotal.ToString("N2")</td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot style="background-color: #f8f9fa; font-weight: bold;">
+                            <tr>
+                                <td colspan="3" style="text-align: right; padding: 15px;">
+                                    <strong>TOTAUX :</strong>
+                                </td>
+                                <td class="positive-value">@Model.SumQuantiteEntrees</td>
+                                <td>-</td>
+                                <td class="montant-value">@Model.SumPrixUnitaire.ToString("N2")</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="empty-movements">
+                    <i class="fas fa-inbox"></i>
+                    <h5>Aucun mouvement d'entrée</h5>
+                    <p>Aucun mouvement d'entrée trouvé pour ce produit.</p>
+                </div>
+            }
+        </div>
+
+        <!-- Boutons d'action -->
+        <div class="action-buttons">
+            <a href="@Url.Action("Index")" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Retour à la liste
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Améliorer l'expérience utilisateur avec des animations
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animation des cartes statistiques
+        const statCards = document.querySelectorAll('.stat-card');
+        statCards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+
+        // Highlight des lignes du tableau au survol
+        const tableRows = document.querySelectorAll('.table-custom tbody tr');
+        tableRows.forEach(row => {
+            row.addEventListener('mouseenter', function() {
+                this.style.backgroundColor = '#e3f2fd';
+            });
+            row.addEventListener('mouseleave', function() {
+                this.style.backgroundColor = '';
+            });
+        });
+    });
+</script>

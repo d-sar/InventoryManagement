@@ -40,7 +40,7 @@
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-users"></i> Contacts
+                                <i class="fas fa-users"></i> Partenaires 
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" asp-controller="Client" asp-action="Index"><i class="fas fa-user-friends"></i> Clients</a></li>
@@ -49,7 +49,7 @@
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-file-alt"></i> Documents
+                                <i class="fas fa-file-alt"></i> Bons
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" asp-controller="Bon" asp-action="Index" asp-route-type="BS"><i class="fas fa-arrow-up"></i> Bons de sortie</a></li>
@@ -58,10 +58,16 @@
                                 <li><a class="dropdown-item" asp-controller="Bon" asp-action="Index" asp-route-type="BRC"><i class="fas fa-undo"></i> Bons de retour Client</a></li>
                             </ul>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="StockHistory" asp-action="Index">
-                                 Fiche de Stock
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-box"></i> Stock
                             </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-controller="StockHistory" asp-action="Index"> Fiche de Stock</a></li>
+                                <li><a class="dropdown-item" asp-controller="StockGlobal" asp-action="Index"> Stock Global</a></li>
+                                <li><a class="dropdown-item" asp-controller="StockValorise" asp-action="Index"> Stock Global Valorisee</a></li>
+                             
+                            </ul>
                         </li>
                     </ul>
                 </div>

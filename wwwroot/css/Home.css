@@ -1,0 +1,136 @@
+﻿
+body {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../img/stock-bg.jpg') no-repeat center center fixed;
+    background-size: cover;
+    font-family: 'Segoe UI', sans-serif;
+    color: #fff;
+}
+
+.hero {
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 0 20px;
+}
+
+    .hero h1 {
+        font-size: 3rem;
+        font-weight: bold;
+        margin-bottom: 20px;
+        animation: fadeInDown 1.2s ease-in-out;
+    }
+
+    .hero p {
+        font-size: 1.2rem;
+        max-width: 700px;
+        margin-bottom: 30px;
+        animation: fadeInUp 1.5s ease-in-out;
+    }
+
+    .hero a {
+        padding: 12px 30px;
+        font-size: 1rem;
+        margin: 5px;
+        border-radius: 30px;
+        text-decoration: none;
+        transition: 0.3s;
+    }
+
+.btn-blue {
+    background-color: #007bff;
+    color: #fff;
+}
+
+    .btn-blue:hover {
+        background-color: #0056b3;
+    }
+
+.btn-outline-light {
+    border: 2px solid #fff;
+    color: #fff;
+}
+
+    .btn-outline-light:hover {
+        background-color: #fff;
+        color: #007bff;
+    }
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.features {
+    padding: 60px 20px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #f0f4f8, #e6f0fa);
+}
+
+    .features h2 {
+        font-size: 2.5rem;
+        color: #007bff;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+.feature-box {
+    background-color: #fff;
+    border-radius: 20px;
+    padding: 30px 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .feature-box:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    }
+
+    .feature-box i {
+        font-size: 3rem;
+        color: #007bff;
+        margin-bottom: 15px;
+        transition: transform 0.3s ease;
+    }
+
+    .feature-box:hover i {
+        transform: scale(1.2);
+    }
+
+    .feature-box h4 {
+        font-size: 1.4rem;
+        margin-bottom: 15px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .feature-box p {
+        font-size: 1rem;
+        color: #555;
+    }
+

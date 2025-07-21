@@ -1,0 +1,165 @@
+﻿@model InventoryManagementMVC.Models.ViewModels.StockGlobalFilterViewModel
+
+@{
+    ViewData["Title"] = "Stock Global";
+    var query = Context.Request.Query;
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<link rel="stylesheet" href="~/css/StockGlobal.css"/>
+
+<div class="stock-global-container">
+    <div class="content-wrapper">
+        <div class="page-header">
+            <h1><i class="fas fa-chart-bar"></i> Stock Global</h1>
+            <p class="subtitle">Vue d'ensemble des stocks de tous les produits</p>
+        </div>
+
+        <!-- Filtres -->
+        <div class="filters-section">
+            <form method="get">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-calendar-alt"></i> Date limite
+                            </label>
+                            <input type="date" name="dateLimite" class="form-control" 
+                                   value="@Model.DateLimite?.ToString("yyyy-MM-dd")" />
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-tags"></i> Catégorie
+                            </label>
+                            <select name="categorieId" class="form-control">
+                                <option value="">-- Toutes les catégories --</option>
+                                @foreach (var categorie in Model.Categories)
+                                {
+                                    <option value="@categorie.IdCategorie" selected="@(query["idCategorie"] == categorie.IdCategorie.ToString())">
+                                        @categorie.Nom
+                                    </option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-search"></i> Rechercher un produit
+                            </label>
+                            <input type="text" name="rechercheLibelle" class="form-control" 
+                                   placeholder="Nom du produit..." value="@Model.RechercheLibelle" />
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="submit" class="btn btn-search form-control">
+                                <i class="fas fa-search"></i> Filtrer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Statistiques 
+        <div class="stats-cards">
+            <div class="stat-card produits">
+                <div class="stat-value">@Model.TotalProduits</div>
+                <div class="stat-label">Produits</div>
+            </div>
+            <div class="stat-card entrees">
+                <div class="stat-value">@Model.TotalEntrees</div>
+                <div class="stat-label">Total Entrées</div>
+            </div>
+            <div class="stat-card sorties">
+                <div class="stat-value">@Model.TotalSorties</div>
+                <div class="stat-label">Total Sorties</div>
+            </div>
+            <div class="stat-card stock">
+                <div class="stat-value">@Model.TotalStock</div>
+                <div class="stat-label">Stock Total</div>
+            </div>
+        </div>-->
+
+        <!-- Tableau -->
+        @if (Model.Stocks.Any())
+        {
+            <div class="table-container">
+                <div class="responsive-table">
+                    <table class="table table-custom">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Produit</th>
+                                <th>Catégorie</th>
+                                <th>BE</th>
+                                <th>RC</th>
+                                <th>Total Entrées<br/>(BE + RC)</th>
+                                <th>BS</th>
+                                <th>RF</th>
+                                <th>Total Sorties<br/>(BS + RF)</th>
+                                <th>Stock Calculé<br />(Total Entrées - Total Sorties)</th>
+                                <th>PMP</th>
+                                <!--
+                                <th>Stock Initial</th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var stock in Model.Stocks)
+                            {
+                                <tr>
+                                    <td><strong>P-@stock.IdProduit</strong></td>
+                                    <td>@stock.Libelle</td>
+                                    <td>@stock.Categorie</td>
+                                    <td class="entree-value">@stock.EntreesBE</td>
+                                    <td class="entree-value">@stock.RetourClient</td>
+                                    <td class="entree-value"><strong>@stock.SumEntrees</strong></td>
+                                    <td class="sortie-value">@stock.SortiesBS</td>
+                                    <td class="sortie-value">@stock.RetourFournisseur</td>
+                                    <td class="sortie-value"><strong>@stock.SumSorties</strong></td>
+                                    <td class="@(stock.Stock > 0 ? "stock-positive" : stock.Stock < 0 ? "stock-negative" : "stock-zero")">
+                                        <strong>@stock.Stock</strong>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm" onclick="StockValorisee(@stock.IdProduit)">
+                                            <i class="fas fa-box"></i>
+                                        </button>
+                                    </td>
+                                   
+                                    
+                                    <!-- 
+                                    <td class="@(stock.StockPhysique > 0 ? "stock-positive" : stock.StockPhysique < 0 ? "stock-negative" : "stock-zero")">
+                                        <strong>@stock.StockPhysique</strong>
+                                    </td>  -->
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h5>Aucun produit trouvé</h5>
+                <p>Aucun produit ne correspond aux critères de recherche.</p>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function StockValorisee(idProduit) {
+            const dateLimite = '@Model.DateLimite?.ToString("yyyy-MM-dd")';
+            const url = '@Url.Action("Details", "StockValorise")' + '?id=' + idProduit + '&dateLimite=' + dateLimite;
+            window.location.href = url;
+        }
+    </script>
+}

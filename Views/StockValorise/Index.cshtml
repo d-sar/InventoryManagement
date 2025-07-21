@@ -1,0 +1,159 @@
+﻿@model InventoryManagementMVC.Models.ViewModels.StockValoriseFilterViewModel
+@{
+    ViewData["Title"] = "Stock Global Valorisé";
+    var query = Context.Request.Query;
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="~/css/StockValorise.css" />
+
+<div class="stock-valorise-container">
+    <div class="content-wrapper">
+        <div class="page-header">
+            <h1><i class="fas fa-chart-line"></i> Stock Global Valorisé</h1>
+            <p class="subtitle">État de stock global valorisé avec calcul du PMP</p>
+        </div>
+
+        <!-- Filtres -->
+        <div class="filters-section">
+            <h4><i class="fas fa-filter"></i> Filtres</h4>
+            <form method="get">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-calendar-alt"></i> Date limite
+                            </label>
+                            <input type="date" name="dateLimite" class="form-control" 
+                                   value="@Model.DateLimite?.ToString("yyyy-MM-dd")" />
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-tags"></i> Catégorie
+                            </label>
+                            <select name="categorieId" class="form-control">
+                                <option value="">-- Toutes les catégories --</option>
+                                @foreach (var categorie in Model.Categories)
+                                {
+                                    <option value="@categorie.IdCategorie" selected="@(query["idCategorie"] == categorie.ToString())"
+
+                                    >
+                                        @categorie.Nom
+                                    </option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-search"></i> Rechercher un produit
+                            </label>
+                            <input type="text" name="rechercheLibelle" class="form-control" 
+                                   placeholder="Nom du produit..." value="@Model.RechercheLibelle" />
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="submit" class="btn btn-search form-control">
+                                <i class="fas fa-search"></i> Filtrer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Statistiques 
+        <div class="stats-cards">
+            <div class="stat-card produits">
+                <div class="stat-value">@Model.TotalProduits</div>
+                <div class="stat-label">Produits</div>
+            </div>
+            <div class="stat-card entrees">
+                <div class="stat-value">@Model.TotalQuantiteEntrees</div>
+                <div class="stat-label">Quantité Entrées</div>
+            </div>
+            <div class="stat-card sorties">
+                <div class="stat-value">@Model.TotalQuantiteSorties</div>
+                <div class="stat-label">Quantité Sorties</div>
+            </div>
+            <div class="stat-card stock-physique">
+                <div class="stat-value">@Model.TotalStockPhysique</div>
+                <div class="stat-label">Stock Physique</div>
+            </div>
+            <div class="stat-card stock-valorise">
+                <div class="stat-value">@Model.TotalStockValorise.ToString("N2")</div>
+                <div class="stat-label">Stock Valorisé</div>
+            </div>
+            <div class="stat-card pmp-global">
+                <div class="stat-value">@Model.PmpGlobal.ToString("N2")</div>
+                <div class="stat-label">PMP Global</div>
+            </div>
+        </div>-->
+
+        <!-- Tableau -->
+        @if (Model.Stocks.Any())
+        {
+            <div class="table-container">
+                <div class="responsive-table">
+                    <table class="table table-custom">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Produit</th>
+                                <!-- 
+                                <th>Catégorie</th> -->
+                                <th>Totale <br/>Entrées</th>
+                                
+                                <th>Totale de<br />Sortie</th>
+                                <th>Totale de<br />Prix Unitaire</th>
+                                <th>PMP</th>
+                                <!--
+                                <th>Stock Valorisé</th>-->
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var stock in Model.Stocks)
+                            {
+                                <tr>
+                                    <td><strong>P-@stock.IdProduit</strong></td>
+                                    <td>@stock.Libelle</td>
+                                    <!-- 
+                                    <td>@stock.Categorie</td> -->
+                                    <td class="entree-value">@stock.SumQuantiteEntrees</td>
+                                    
+                                    <td class="sortie-value">@stock.SumSorties</td>
+                                    <td class="montant-value">@stock.SumPrixUnitaire.ToString("N2")</td>
+                                    <td class="pmp-value">@stock.PMP.ToString("N2")</td>
+                                    <!-- 
+                                    <td class="stock-valorise-value">@stock.StockValorise.ToString("N2")</td>-->
+                                    <td>
+                                        <a href="@Url.Action("Details", new { id = stock.IdProduit, dateLimite = Model.DateLimite })" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h5>Aucun produit trouvé</h5>
+                <p>Aucun produit ne correspond aux critères de recherche.</p>
+            </div>
+        }
+
+       
+    </div>
+</div>
