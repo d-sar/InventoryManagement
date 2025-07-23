@@ -1,0 +1,251 @@
+﻿@model InventoryManagementMVC.Models.ViewModels.SituationPartenaires.SituationPartenairesViewModel
+
+@{
+    ViewData["Title"] = "Situation Partenaires";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<style>
+    .situation-container {
+        min-height: 100vh;
+        padding: 20px 0;
+    }
+
+    .content-wrapper {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        padding: 30px;
+        margin: 20px auto;
+        max-width: 1400px;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 3px solid #007bff;
+    }
+
+    .search-form {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        border-left: 4px solid #007bff;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 0.75rem;
+    }
+
+    .btn-search {
+        background: #007bff;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        color: white;
+    }
+
+    .results-section {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-top: 2rem;
+    }
+
+    .table-custom thead {
+        background: #007bff;
+        color: white;
+    }
+
+    .table-custom th, .table-custom td {
+        text-align: center;
+        padding: 0.75rem;
+    }
+
+    .summary-header {
+        background: #e9f5ff;
+        padding: 1rem;
+        border-bottom: 1px solid #dee2e6;
+        border-radius: 8px 8px 0 0;
+    }
+
+    .total-summary {
+        font-weight: 700;
+        font-size: 1.1rem;
+        padding: 1rem;
+        text-align: right;
+    }
+</style>
+
+<div class="situation-container">
+    <div class="content-wrapper">
+        <div class="page-header">
+            <h1><i class="fas fa-chart-bar"></i> Situation Partenaires</h1>
+        </div>
+
+        <div class="search-form">
+            <form asp-action="Index" method="post">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label asp-for="Filter.TypePartenaire" class="form-label">Type de partenaire</label>
+                            <select asp-for="Filter.TypePartenaire" class="form-select" id="typePartenaireSelect">
+                                <option value="">-- Sélectionner --</option>
+                                <option value="Client" selected="@(Model.Filter.TypePartenaire == "Client")">Client</option>
+                                <option value="Fournisseur" selected="@(Model.Filter.TypePartenaire == "Fournisseur")">Fournisseur</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label asp-for="Filter.PartenaireId" class="form-label">Nom du partenaire</label>
+                            <select asp-for="Filter.PartenaireId" class="form-select" id="partenaireSelect">
+                                <option value="">-- Choisir --</option>
+                                @foreach (var partenaire in Model.Partenaires)
+                                {
+                                    <option value="@partenaire.Id" selected="@(Model.Filter.PartenaireId == partenaire.Id)">@partenaire.Nom</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label asp-for="Filter.DateDebut" class="form-label">Date début</label>
+                            <input asp-for="Filter.DateDebut" type="date" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label asp-for="Filter.DateFin" class="form-label">Date fin</label>
+                            <input asp-for="Filter.DateFin" type="date" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 text-end">
+                        <button type="submit" class="btn btn-search">
+                            <i class="fas fa-search"></i> Filtrer
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="clearFilters()">
+                            <i class="fas fa-times"></i> Effacer
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        @if (Model.Result != null)
+        {
+            <div class="results-section p-4 border rounded shadow-sm bg-light">
+                <div class="summary-header mb-3">
+                    <h5 class="text-primary">@Model.Result.Partenaire.Type.ToUpper() : <strong>@Model.Result.Partenaire.Nom</strong></h5>
+                    <p class="text-muted mb-1">
+                        <i class="fas fa-map-marker-alt"></i> Adresse : @Model.Result.Partenaire.Adresse<br />
+                        <i class="fas fa-envelope"></i> Email : @Model.Result.Partenaire.Email<br />
+                        <i class="fas fa-calendar-alt"></i> Période : du @Model.Result.DateDebut.ToString("dd/MM/yyyy") au @Model.Result.DateFin.ToString("dd/MM/yyyy")
+                    </p>
+                </div>
+
+                @if (Model.Result.Documents.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover table-striped">
+                            <thead class="table-dark text-center">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>N° Document</th>
+                                    <th>Montant</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var doc in Model.Result.Documents)
+                                {
+                                    <tr class="@(doc.EstPositif ? "" : "table-warning")">
+                                        <td>@doc.Date.ToString("dd/MM/yyyy")</td>
+                                        <td>@doc.NumeroDocument</td>
+                                        <td class="text-end">
+                                            @if (doc.EstPositif)
+                                            {
+                                                <span class="text-success fw-bold">@doc.Montant.ToString("N2")</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-danger fw-bold">-@doc.Montant.ToString("N2")</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="2" class="text-end fw-bold">Total</td>
+                                    <td class="text-end">
+                                        <strong class="@(Model.Result.TotalGeneral >= 0 ? "text-success" : "text-danger")">
+                                            @Model.Result.TotalGeneral.ToString("N2") DH
+                                        </strong>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info mt-4">
+                        <i class="fas fa-info-circle"></i> Aucun document trouvé pour cette période.
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const typeSelect = document.getElementById('typePartenaireSelect');
+        const partenaireSelect = document.getElementById('partenaireSelect');
+
+        typeSelect.addEventListener('change', async function () {
+            const selectedType = this.value;
+            partenaireSelect.innerHTML = '<option value="">-- Choisir --</option>';
+
+            if (selectedType) {
+                try {
+                    const response = await fetch(`/SituationPartenaires/GetPartenairesByType?type=${selectedType}`);
+                    const partenaires = await response.json();
+
+                    partenaires.forEach(p => {
+                        const option = document.createElement('option');
+                        option.value = p.id;
+                        option.textContent = p.nom;
+                        partenaireSelect.appendChild(option);
+                    });
+                } catch (error) {
+                    console.error('Erreur chargement partenaires:', error);
+                }
+            }
+        });
+    });
+
+    function clearFilters() {
+        document.getElementById('typePartenaireSelect').value = '';
+        document.getElementById('partenaireSelect').innerHTML = '<option value="">-- Choisir --</option>';
+        document.querySelector('input[name="Filter.DateDebut"]').value = '';
+        document.querySelector('input[name="Filter.DateFin"]').value = '';
+    }
+</script>

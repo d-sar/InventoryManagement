@@ -17,10 +17,12 @@ namespace InventoryManagementMVC.Services
         public async Task<IEnumerable<Client>> GetAllClientsAsync()
         {
             return await _context.Clients
-                .Include(c => c.Bons)
-                    .ThenInclude(b => b.LignesBon)
-                .OrderBy(c => c.Nom)
-                .ToListAsync();
+      .Include(c => c.Bons)
+          .ThenInclude(b => b.LignesBon)
+      .Include(c => c.Bons)
+          .ThenInclude(b => b.DocType)
+      .OrderBy(c => c.Nom)
+      .ToListAsync();
         }
 
         public async Task<Client?> GetClientByIdAsync(int id)

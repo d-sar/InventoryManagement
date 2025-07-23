@@ -7,66 +7,88 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-    
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/layout.css"/>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-primary border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary border-bottom box-shadow mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
-                    <i class="fas fa-boxes"></i> Gestion Stock
+                    <i class="fas fa-warehouse"></i> Gestion Stock 
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between">
+                    <ul class="navbar-nav me-auto">
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
                                 <i class="fas fa-home"></i> Accueil
                             </a>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-box"></i> Produits
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-boxes"></i> Produits
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" asp-controller="Produit" asp-action="Index"><i class="fas fa-list"></i> Liste des produits</a></li>
-                                <li><a class="dropdown-item" asp-controller="Produit" asp-action="Create"><i class="fas fa-plus"></i> Nouveau produit</a></li>
+                                <li><a class="dropdown-item" asp-controller="Produit" asp-action="Index"><i class="fas fa-list-ul"></i> Liste des produits</a></li>
+                                <li><a class="dropdown-item" asp-controller="Produit" asp-action="Create"><i class="fas fa-plus-circle"></i> Nouveau produit</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" asp-controller="Categorie" asp-action="Index"><i class="fas fa-tags"></i> Catégories</a></li>
                             </ul>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-users"></i> Partenaires 
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-handshake"></i> Partenaires
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" asp-controller="Client" asp-action="Index"><i class="fas fa-user-friends"></i> Clients</a></li>
-                                <li><a class="dropdown-item" asp-controller="Fournisseur" asp-action="Index"><i class="fas fa-truck"></i> Fournisseurs</a></li>
+                                <li><a class="dropdown-item" asp-controller="Client" asp-action="Index"><i class="fas fa-users"></i> Clients</a></li>
+                                <li><a class="dropdown-item" asp-controller="Fournisseur" asp-action="Index"><i class="fas fa-truck-moving"></i> Fournisseurs</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" asp-controller="SituationPartenaires" asp-action="Index"><i class="fas fa-chart-line"></i> Situation Partenaires</a></li>
                             </ul>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-file-alt"></i> Bons
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-file-invoice"></i> Documents
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" asp-controller="Bon" asp-action="Index" asp-route-type="BS"><i class="fas fa-arrow-up"></i> Bons de sortie</a></li>
-                                <li><a class="dropdown-item" asp-controller="Bon" asp-action="Index" asp-route-type="BE"><i class="fas fa-arrow-down"></i> Bons d'entrée</a></li>
-                                <li><a class="dropdown-item" asp-controller="Bon" asp-action="Index" asp-route-type="BRF"><i class="fas fa-undo"></i> Bons de retour Fournisseaur</a></li>
-                                <li><a class="dropdown-item" asp-controller="Bon" asp-action="Index" asp-route-type="BRC"><i class="fas fa-undo"></i> Bons de retour Client</a></li>
+                                <li><a class="dropdown-item" asp-controller="Bon" asp-action="Index" asp-route-type="BS"><i class="fas fa-file-export"></i> Bons de sortie</a></li>
+                                <li><a class="dropdown-item" asp-controller="Bon" asp-action="Index" asp-route-type="BE"><i class="fas fa-file-import"></i> Bons d'entrée</a></li>
+                                <li><a class="dropdown-item" asp-controller="Bon" asp-action="Index" asp-route-type="BRF"><i class="fas fa-undo-alt"></i> Retours Fournisseur</a></li>
+                                <li><a class="dropdown-item" asp-controller="Bon" asp-action="Index" asp-route-type="BRC"><i class="fas fa-undo-alt"></i> Retours Client</a></li>
                             </ul>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-box"></i> Stock
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-chart-bar"></i> Stock & Rapports
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" asp-controller="StockHistory" asp-action="Index"> Fiche de Stock</a></li>
-                                <li><a class="dropdown-item" asp-controller="StockGlobal" asp-action="Index"> Stock Global</a></li>
-                                <li><a class="dropdown-item" asp-controller="StockValorise" asp-action="Index"> Stock Global Valorisee</a></li>
-                             
+                                <li><a class="dropdown-item" asp-controller="StockHistory" asp-action="Index"><i class="fas fa-clipboard-list"></i> Fiche de Stock</a></li>
+                                <li><a class="dropdown-item" asp-controller="StockGlobal" asp-action="Index"><i class="fas fa-boxes"></i> Stock Global</a></li>
+                                <li><a class="dropdown-item" asp-controller="StockValorise" asp-action="Index"><i class="fas fa-coins"></i> Stock Valorisé</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-bell"></i>
+                                <span class="badge bg-danger rounded-pill">3</span>
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user-circle"></i> Mon Compte
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-user-cog"></i> Profil</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-cog"></i> Paramètres</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt"></i> Déconnexion</a></li>
                             </ul>
                         </li>
                     </ul>
@@ -74,31 +96,38 @@
             </div>
         </nav>
     </header>
+
     <div class="container-fluid">
         <main role="main" class="pb-3">
             @if (TempData["Success"] != null)
             {
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     <i class="fas fa-check-circle"></i> @TempData["Success"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             }
             @if (TempData["Error"] != null)
             {
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="fas fa-exclamation-circle"></i> @TempData["Error"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <i class="fas fa-exclamation-triangle"></i> @TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             }
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="border-top footer text-white">
         <div class="container">
-            &copy; 2025 - Système de Gestion de Stock - <a asp-area="" asp-controller="Home" asp-action="Privacy">Confidentialité</a>
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    &copy; 2025 - Système de Gestion de Stock - <a asp-area="" asp-controller="Home" asp-action="Privacy">Confidentialité</a>
+                </div>
+             
+            </div>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

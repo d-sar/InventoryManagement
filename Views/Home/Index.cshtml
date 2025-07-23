@@ -1,44 +1,240 @@
 ﻿@{
     ViewData["Title"] = "Accueil";
 }
-<link rel="stylesheet" href="~/css/Home.css" />
 
-<div class="hero">
-    <h1><i class="fas fa-boxes"></i> Bienvenue dans la Plateforme de Gestion de Stock</h1>
-    <p>
-        Suivez, gérez et optimisez votre inventaire avec une solution moderne, intuitive et performante.
-    </p>
-    <div>
-        <a asp-controller="Produit" asp-action="Index" class="btn btn-blue">
-            <i class="fas fa-box"></i> Gérer les Produits
-        </a>
-        <a asp-controller="Bon" asp-action="Index" class="btn btn-outline-light">
-            <i class="fas fa-file-alt"></i> Voir les Bons
-        </a>
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, rgba(44, 62, 80, 0.9) 0%, rgba(52, 152, 219, 0.8) 100%), url('../img/stock-bg.jpg') no-repeat center center;
+        background-size: cover;
+        min-height: calc(100vh - 72px);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 2rem;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-content {
+        max-width: 800px;
+        z-index: 2;
+        animation: fadeIn 1s ease-out;
+    }
+
+    .hero-title {
+        font-size: 2.8rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        line-height: 1.2;
+    }
+
+        .hero-title i {
+            margin-right: 15px;
+            color: var(--primary-color);
+        }
+
+    .hero-subtitle {
+        font-size: 1.3rem;
+        margin-bottom: 2.5rem;
+        line-height: 1.6;
+        font-weight: 300;
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn-hero-primary {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 0.8rem 2rem;
+        border-radius: 50px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        border: none;
+    }
+
+        .btn-hero-primary i {
+            margin-right: 10px;
+        }
+
+        .btn-hero-primary:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+    .btn-hero-secondary {
+        background-color: transparent;
+        color: white;
+        padding: 0.8rem 2rem;
+        border-radius: 50px;
+        font-weight: 500;
+        border: 2px solid white;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+    }
+
+        .btn-hero-secondary i {
+            margin-right: 10px;
+        }
+
+        .btn-hero-secondary:hover {
+            background-color: white;
+            color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+    .features-section {
+        padding: 5rem 2rem;
+        background-color: #f8fafc;
+    }
+
+    .section-title {
+        text-align: center;
+        margin-bottom: 3rem;
+        color: var(--secondary-color);
+        font-weight: 700;
+        font-size: 2.2rem;
+    }
+
+    .feature-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2.5rem 2rem;
+        height: 100%;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        text-align: center;
+        border: 1px solid rgba(0, 0, 0, 0.03);
+    }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+    .feature-icon {
+        font-size: 2.5rem;
+        color: var(--primary-color);
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .feature-card:hover .feature-icon {
+        transform: scale(1.2);
+        color: var(--accent-color);
+    }
+
+    .feature-title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: var(--secondary-color);
+    }
+
+    .feature-description {
+        color: #64748b;
+        line-height: 1.6;
+        font-size: 1rem;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .hero-title {
+            font-size: 2rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+        }
+    }
+</style>
+
+<div class="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title">
+            <i class="fas fa-warehouse"></i>Bienvenue dans Gestion Stock Pro
+        </h1>
+        <p class="hero-subtitle">
+            Optimisez votre inventaire avec notre solution complète de gestion de stock.
+            Suivi en temps réel, analyses avancées et gestion simplifiée pour votre entreprise.
+        </p>
+        <div class="hero-buttons">
+            <a asp-controller="Produit" asp-action="Index" class="btn btn-hero-primary">
+                <i class="fas fa-boxes"></i> Gérer les Produits
+            </a>
+            <a asp-controller="Bon" asp-action="Index" class="btn btn-hero-secondary">
+                <i class="fas fa-file-invoice"></i> Voir les Documents
+            </a>
+        </div>
     </div>
 </div>
-<div class="features container">
-    <h2>Fonctionnalités Clés</h2>
-    <div class="row justify-content-center">
-        <div class="col-md-4 d-flex">
-            <div class="feature-box w-100 text-center">
-                <i class="fas fa-warehouse"></i>
-                <h4>Stock en Temps Réel</h4>
-                <p>Consultez les niveaux de stock et mouvements en direct pour une meilleure prise de décision.</p>
+
+<div class="features-section">
+    <div class="container">
+        <h2 class="section-title">Fonctionnalités Clés</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="feature-title">Suivi en Temps Réel</h3>
+                    <p class="feature-description">
+                        Visualisez l'état de votre stock instantanément avec des indicateurs clairs
+                        et des alertes automatiques pour les seuils critiques.
+                    </p>
+                </div>
             </div>
-        </div>
-        <div class="col-md-4 d-flex">
-            <div class="feature-box w-100 text-center">
-                <i class="fas fa-truck"></i>
-                <h4>Suivi des Fournisseurs</h4>
-                <p>Gérez les livraisons, les retours et les historiques de transactions avec vos partenaires.</p>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-truck"></i>
+                    </div>
+                    <h3 class="feature-title">Gestion des Partenaires</h3>
+                    <p class="feature-description">
+                        Gérez facilement vos fournisseurs et clients, suivez les commandes,
+                        les livraisons et les retours en un seul endroit.
+                    </p>
+                </div>
             </div>
-        </div>
-        <div class="col-md-4 d-flex">
-            <div class="feature-box w-100 text-center">
-                <i class="fas fa-chart-line"></i>
-                <h4>Tableaux de Bord</h4>
-                <p>Visualisez les performances, les tendances et optimisez votre chaîne d’approvisionnement.</p>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h3 class="feature-title">Documents Automatisés</h3>
+                    <p class="feature-description">
+                        Générez automatiquement les bons d'entrée, de sortie et de retour
+                        avec une numérotation séquentielle et un archivage sécurisé.
+                    </p>
+                </div>
             </div>
         </div>
     </div>

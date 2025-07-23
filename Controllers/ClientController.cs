@@ -44,8 +44,13 @@ namespace InventoryManagementMVC.Controllers
                     EstActif = c.EstActif,
                     DateInscription = c.DateInscription,
                     NombreBons = c.Bons?.Count ?? 0,
-                    TotalAchats = c.Bons?.Sum(b => b.LignesBon?.Sum(l => l.Quantite * l.PrixUnitaire) ?? 0) ?? 0,
-//DernierAchat = c.Bons?.OrderByDescending(b => b.DateBon).FirstOrDefault()?.DateBon
+                    TotalAchats =
+    (c.Bons?.Where(b => b.DocType != null && b.DocType.Type == "Sortie")
+            .Sum(b => b.LignesBon?.Sum(l => l.Quantite * l.PrixUnitaire) ?? 0) ?? 0)
+    -
+    (c.Bons?.Where(b => b.DocType != null && b.DocType.Type == "RetourClient")
+            .Sum(b => b.LignesBon?.Sum(l => l.Quantite * l.PrixUnitaire) ?? 0) ?? 0),
+                    //DernierAchat = c.Bons?.OrderByDescending(b => b.DateBon).FirstOrDefault()?.DateBon
                 });
 
                 return View(model);
