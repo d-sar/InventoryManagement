@@ -15,13 +15,34 @@ namespace InventoryManagementMVC.Controllers
 
         public async Task<IActionResult> Index()
         {
+            var allPartenaires = await _situationService.GetAllPartenairesAsync();
+
             var viewModel = new SituationPartenairesViewModel
             {
-                Partenaires = await _situationService.GetAllPartenairesAsync()
+                Partenaires = allPartenaires,
+                Filter = new SituationFilterViewModel()
             };
+
+            // Si la liste n'est pas vide, sélectionner automatiquement le premier partenaire
+            if (allPartenaires.Any())
+            {
+                var premier = allPartenaires.First();
+                viewModel.Filter.TypePartenaire = premier.Type;
+                viewModel.Filter.PartenaireId = premier.Id;
+                viewModel.Filter.DateDebut = DateTime.Now.AddMonths(-1);
+                viewModel.Filter.DateFin = DateTime.Now;
+
+                // Charger la situation du premier partenaire
+                viewModel.Result = await _situationService.GetSituationPartenaireAsync(
+                    premier.Id,
+                    viewModel.Filter.DateDebut,
+                    viewModel.Filter.DateFin
+                );
+            }
 
             return View(viewModel);
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Index(SituationFilterViewModel filter)
@@ -84,6 +105,36 @@ namespace InventoryManagementMVC.Controllers
 
             return PartialView("_SituationResult", situation);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Index(int? partenaireId, string type = "Client")
+        {
+            var partenaires = await _situationService.GetPartenairesByTypeAsync(type);
+
+            var viewModel = new SituationPartenairesViewModel
+            {
+                Partenaires = partenaires,
+                Filter = new SituationFilterViewModel
+                {
+                    TypePartenaire = type,
+                    PartenaireId = partenaireId,
+                    DateDebut = DateTime.Now.AddMonths(-1),
+                    DateFin = DateTime.Now
+                }
+            };
+
+            if (partenaireId.HasValue)
+            {
+                viewModel.Result = await _situationService.GetSituationPartenaireAsync(
+                    partenaireId.Value,
+                    viewModel.Filter.DateDebut,
+                    viewModel.Filter.DateFin
+                );
+            }
+
+            return View(viewModel);
+        }
+
 
     }
 }

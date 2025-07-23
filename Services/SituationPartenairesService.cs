@@ -105,10 +105,10 @@ namespace InventoryManagementMVC.Services
         {
             return typeDoc switch
             {
-                "BonSortie" => $"BS {numero:D4}",
-                "BonEntree" => $"BE {numero:D4}",
-                "RetourClient" => $"RC {numero:D4}",
-                "RetourFournisseur" => $"RF {numero:D4}",
+                "Sortie" => $"BS-{numero:D4}",
+                "Entree" => $"BE-{numero:D4}",
+                "RetourClient" => $"RC-{numero:D4}",
+                "RetourFournisseur" => $"RF-{numero:D4}",
                 
                 _ => $"{typeDoc} {numero:D4}"
             };
@@ -124,8 +124,8 @@ namespace InventoryManagementMVC.Services
                 ("Facture", "Client") => true,        // Facture client = positif
 
                 // Pour les fournisseurs
-                ("BonEntree", "Fournisseur") => false,     // Achat au fournisseur = négatif
-                ("RetourFournisseur", "Fournisseur") => true, // Retour au fournisseur = positif
+                ("BonEntree", "Fournisseur") => true,     // Achat au fournisseur = négatif
+                ("RetourFournisseur", "Fournisseur") => false, // Retour au fournisseur = positif
                 ("Facture", "Fournisseur") => false,       // Facture fournisseur = négatif
 
                 _ => true // Par défaut positif
