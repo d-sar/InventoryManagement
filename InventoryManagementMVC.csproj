@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <Folder Include="Migrations\" />
+    <Folder Include="Models\ViewModels\Reglement\" />
   </ItemGroup>
 
 </Project>

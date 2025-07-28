@@ -18,8 +18,9 @@ namespace InventoryManagementMVC.Data
         public DbSet<DocType> DocTypes { get; set; }
         public DbSet<LigneBon> LigneBons { get; set; }
         public DbSet<User> User { get; set; }
+        public DbSet<Reglement> Reglements { get; set; }
 
-   
+
         public DbSet<LigneBon> LignesBon { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -76,6 +77,14 @@ namespace InventoryManagementMVC.Data
                 .HasMany(c => c.Produits)
                 .WithOne(p => p.Categorie)
                 .HasForeignKey(p => p.IdCategorie);
+
+            // Relation entre reglement 
+            modelBuilder.Entity<Reglement>()
+                .HasOne(r => r.Partenaire)
+                .WithMany(p => p.Reglements)
+                .HasForeignKey(r => r.IdUser)
+                .OnDelete(DeleteBehavior.Restrict);
+
 
             // Index pour performance
             modelBuilder.Entity<Produit>()

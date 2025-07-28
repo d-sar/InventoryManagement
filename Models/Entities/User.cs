@@ -25,6 +25,8 @@ namespace InventoryManagementMVC.Models.Entities
         [StringLength(50)]
         public string Type { get; set; } = string.Empty;
         public ICollection<Bon> Bons { get; set; } = null!;
+        public ICollection<Reglement> Reglements { get; set; } = null!;
+
 
         public virtual void CreerBon()
         {

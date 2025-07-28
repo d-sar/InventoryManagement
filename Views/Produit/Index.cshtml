@@ -47,16 +47,6 @@
                         <i class="fas fa-times"></i> Effacer
                     </a>
                 </div>
-                <div class="col-md-4">
-                    <label for="filtreStock" class="form-label">Filtrer par stock</label>
-                    <select id="filtreStock" name="filtreStock" class="form-select">
-                        <option value="">Tous les stocks</option>
-                        <option value="faible" selected="@(ViewBag.FiltreStock == "faible")">Stock faible</option>
-                        <option value="normal" selected="@(ViewBag.FiltreStock == "normal")">Stock normal</option>
-                        <option value="rupture" selected="@(ViewBag.FiltreStock == "rupture")">Rupture de stock</option>
-                    </select>
-                </div>
-
             </div>
         </form>
     </div>
