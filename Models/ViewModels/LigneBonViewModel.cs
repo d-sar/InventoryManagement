@@ -20,5 +20,9 @@ namespace InventoryManagementMVC.Models.ViewModels
 
         // Propriété calculée pour l'affichage
         public decimal Total => Quantite * PrixUnitaire;
+        //
+        public string? LibelleProduit { get; set; }
+        public string? CategorieProduit { get; set; }
+        public int StockDisponible { get; set; }
     }
 }

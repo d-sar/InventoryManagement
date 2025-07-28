@@ -415,5 +415,133 @@ namespace InventoryManagementMVC.Services
                 return new BonStatsViewModel();
             }
         }
+
+        public async Task<Bon?> GetBonForEditAsync(int id)
+        {
+            return await _context.Bons
+                .Include(b => b.Partenaire)
+                .Include(b => b.DocType)
+                .Include(b => b.LignesBon)
+                    .ThenInclude(l => l.Produit)
+                        .ThenInclude(p => p.Categorie)
+                .FirstOrDefaultAsync(b => b.IdBon == id);
+        }
+
+        public async Task<bool> UpdateBonAsync(int bonId, string typeBon, int partenaireId, DateTime date, List<LigneBon> nouvellesLignes)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var bon = await _context.Bons
+                    .Include(b => b.LignesBon)
+                    .Include(b => b.DocType)
+                    .FirstOrDefaultAsync(b => b.IdBon == bonId);
+
+                if (bon == null)
+                    return false;
+
+                // Vérifier que le partenaire existe
+                var partenaire = await _context.User.FindAsync(partenaireId);
+                if (partenaire == null)
+                    throw new ArgumentException("Partenaire introuvable");
+
+                // 1. Annuler l'effet sur le stock des anciennes lignes
+                foreach (var ancienneLigne in bon.LignesBon.ToList())
+                {
+                    var produit = await _context.Produits.FindAsync(ancienneLigne.IdProduit);
+                    if (produit != null)
+                    {
+                        // Inverser l'effet selon le type de bon
+                        switch (typeBon)
+                        {
+                            case "BE": // Bon d'entrée - diminuer le stock
+                                produit.QuantiteStock -= ancienneLigne.Quantite;
+                                if (produit.QuantiteStock < 0) produit.QuantiteStock = 0;
+                                break;
+                            case "BS": // Bon de sortie - augmenter le stock
+                                produit.QuantiteStock += ancienneLigne.Quantite;
+                                break;
+                            case "BRF": // Bon de retour fournisseur - augmenter le stock
+                                produit.QuantiteStock += ancienneLigne.Quantite;
+                                break;
+                            case "BRC": // Bon de retour client - diminuer le stock
+                                produit.QuantiteStock -= ancienneLigne.Quantite;
+                                if (produit.QuantiteStock < 0) produit.QuantiteStock = 0;
+                                break;
+                        }
+                    }
+                }
+
+                // 2. Supprimer les anciennes lignes
+                _context.LignesBon.RemoveRange(bon.LignesBon);
+
+                // 3. Mettre à jour les informations du bon
+                bon.IdUser = partenaireId;
+                bon.Date = date;
+
+                // 4. Ajouter les nouvelles lignes
+                foreach (var nouvelleLigne in nouvellesLignes)
+                {
+                    var produit = await _context.Produits.FindAsync(nouvelleLigne.IdProduit);
+                    if (produit == null)
+                        throw new ArgumentException($"Produit avec ID {nouvelleLigne.IdProduit} introuvable");
+
+                    if (nouvelleLigne.Quantite <= 0)
+                        throw new ArgumentException("La quantité doit être positive");
+
+                    if (nouvelleLigne.PrixUnitaire <= 0)
+                        throw new ArgumentException("Le prix unitaire doit être positif");
+
+                    bon.LignesBon.Add(new LigneBon
+                    {
+                        IdProduit = nouvelleLigne.IdProduit,
+                        Quantite = nouvelleLigne.Quantite,
+                        PrixUnitaire = nouvelleLigne.PrixUnitaire
+                    });
+                }
+
+                if (!bon.LignesBon.Any())
+                    throw new ArgumentException("Le bon doit contenir au moins une ligne");
+
+                // 5. Appliquer l'effet sur le stock des nouvelles lignes
+                foreach (var nouvelleLigne in bon.LignesBon)
+                {
+                    var produit = await _context.Produits.FindAsync(nouvelleLigne.IdProduit);
+                    if (produit != null)
+                    {
+                        // Appliquer l'effet selon le type de bon
+                        switch (typeBon)
+                        {
+                            case "BE": // Bon d'entrée - augmenter le stock
+                                produit.QuantiteStock += nouvelleLigne.Quantite;
+                                produit.PrixUnitaire = nouvelleLigne.PrixUnitaire;
+                                break;
+                            case "BS": // Bon de sortie - diminuer le stock
+                                produit.QuantiteStock -= nouvelleLigne.Quantite;
+                                if (produit.QuantiteStock < 0)
+                                    produit.QuantiteStock = 0;
+                                break;
+                            case "BRF": // Bon de retour fournisseur - diminuer le stock
+                                produit.QuantiteStock -= nouvelleLigne.Quantite;
+                                if (produit.QuantiteStock < 0)
+                                    produit.QuantiteStock = 0;
+                                break;
+                            case "BRC": // Bon de retour client - augmenter le stock
+                                produit.QuantiteStock += nouvelleLigne.Quantite;
+                                break;
+                        }
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return true;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
     }
 }

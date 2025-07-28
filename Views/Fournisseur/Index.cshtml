@@ -68,6 +68,14 @@
                                         <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">
                                             <i class="fas fa-trash"></i>
                                         </a>
+                                        <a asp-controller="SituationPartenaires"
+                                           asp-action="Index"
+                                           asp-route-partenaireId="@item.Id"
+                                           asp-route-type="Fournisseur"
+                                           class="btn btn-secondary btn-sm"
+                                           title="Voir situation">
+                                            <i class="fas fa-chart-line"></i>
+                                        </a>
                                     </div>
                                 </td>
                             </tr>

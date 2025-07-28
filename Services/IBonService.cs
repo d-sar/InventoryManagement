@@ -14,5 +14,10 @@ namespace InventoryManagementMVC.Services
         Task<List<Bon>> GetBonsByPartenaireAsync(int partenaireId, string type);
         Task<List<Bon>> GetBonsByDateRangeAsync(DateTime dateDebut, DateTime dateFin, string type);
         Task<BonStatsViewModel> GetBonStatsAsync(string type);
+
+
+        Task<Bon?> GetBonForEditAsync(int id);
+        Task<bool> UpdateBonAsync(int bonId, string typeBon, int partenaireId, DateTime date, List<LigneBon> lignes);
+
     }
 }

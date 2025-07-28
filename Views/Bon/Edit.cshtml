@@ -1,0 +1,428 @@
+﻿@using InventoryManagementMVC.Models.ViewModels
+@model BonCreateViewModel
+
+@{
+    ViewData["Title"] = ViewBag.TitrePage;
+    var config = new Dictionary<string, (string color, string bgColor, string prefix, string icon)>
+    {
+        { "BE", ("text-success", "bg-success", "BE", "fas fa-arrow-down") },
+        { "BS", ("text-danger", "bg-danger", "BS", "fas fa-arrow-up") },
+        { "BRF", ("text-warning", "bg-warning", "BRF", "fas fa-undo") },
+        { "BRC", ("text-info", "bg-info", "BRC", "fas fa-undo") }
+    };
+    var currentConfig = config.GetValueOrDefault(Model.TypeBon, ("text-primary", "bg-primary", "BON", "fas fa-file"));
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>
+        <i class="@currentConfig.Item4 me-2 @currentConfig.Item1"></i>
+        @ViewBag.TitrePage
+    </h2>
+    <div>
+        <a asp-action="Details" asp-route-id="@ViewBag.BonId" asp-route-type="@Model.TypeBon" class="btn btn-outline-info me-2">
+            <i class="fas fa-eye me-1"></i>Voir les détails
+        </a>
+        <a asp-action="Index" asp-route-type="@Model.TypeBon" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+        </a>
+    </div>
+</div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- Alert d'avertissement pour la modification -->
+<div class="alert alert-warning" role="alert">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    <strong>Attention :</strong> La modification de ce bon affectera les stocks. Les anciennes quantités seront annulées et les nouvelles seront appliquées.
+</div>
+
+<form asp-action="Edit" asp-route-id="@ViewBag.BonId" method="post" id="bonForm">
+    <input type="hidden" asp-for="TypeBon" />
+
+    <div class="row">
+        <!-- Informations générales -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header @currentConfig.Item2 text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Informations générales
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label asp-for="PartenaireId" class="form-label">@ViewBag.TypePartenaire *</label>
+                        <select asp-for="PartenaireId" class="form-select" required>
+                            <option value="">Sélectionnez un @ViewBag.TypePartenaire.ToLower()</option>
+                            @foreach (var partenaire in ViewBag.Partenaires)
+                            {
+                                if (Model.PartenaireId == partenaire.Id)
+                                {
+                                    <option value="@partenaire.Id" selected>@partenaire.Nom</option>
+                                }
+                                else
+                                {
+                                    <option value="@partenaire.Id">@partenaire.Nom</option>
+                                }
+                            }
+                        </select>
+                        <span asp-validation-for="PartenaireId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Type de bon</label>
+                        <div class="form-control d-flex align-items-center">
+                            <i class="@currentConfig.Item4 me-2 @currentConfig.Item1"></i>
+                            <span class="badge @currentConfig.Item2 me-2">@currentConfig.Item3</span>
+                            @ViewBag.TitrePage.Replace("Modifier ", "")
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Date" class="form-label"></label>
+                        <input asp-for="Date" type="date" value="@DateTime.Now.ToString("dd/MM/yyyy")" class="form-control" />
+                        <span asp-validation-for="Date" class="text-danger"></span>
+                    </div>
+
+
+                    <div class="mb-3">
+                        <label class="form-label">Bon N°</label>
+                        <div class="form-control">
+                            <span class="badge @currentConfig.Item2">@currentConfig.Item3-@ViewBag.BonId.ToString().PadLeft(4, '0')</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Articles -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header @currentConfig.Item2 text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-boxes me-2"></i>Articles
+                        <button type="button" class="btn btn-sm btn-light ms-2" onclick="addLigne()">
+                            <i class="fas fa-plus"></i> Ajouter un article
+                        </button>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="lignesContainer">
+                        <!-- Les lignes existantes et nouvelles seront ajoutées dynamiquement -->
+                    </div>
+
+                    <div class="text-muted text-center py-3" id="noLignesMessage" style="display: none;">
+                        <i class="fas fa-inbox fa-2x mb-2"></i>
+                        <p>Aucun article ajouté. Cliquez sur "Ajouter un article" pour commencer.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Résumé et actions -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-calculator me-2"></i>Résumé
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h4 class="mb-1 text-info" id="totalArticles">0</h4>
+                                <small class="text-muted">Articles</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h4 class="mb-1 text-warning" id="totalQuantite">0</h4>
+                                <small class="text-muted">Quantité totale</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h4 class="mb-1 text-success" id="totalMontant">0,00 DH</h4>
+                                <small class="text-muted">Montant total</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 d-flex justify-content-end">
+                            <a asp-action="Details" asp-route-id="@ViewBag.BonId" asp-route-type="@Model.TypeBon" class="btn btn-secondary me-2">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn btn-warning" id="submitBtn">
+                                <i class="fas fa-save"></i> Modifier le Bon
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!-- Template pour les lignes -->
+<template id="ligneTemplate">
+    <div class="ligne-item border rounded p-3 mb-3">
+        <div class="row">
+            <div class="col-md-4">
+                <label class="form-label">Produit *</label>
+                <select class="form-select produit-select" name="Lignes[INDEX].IdProduit" required>
+                    <option value="">Sélectionnez un produit</option>
+                    @foreach (var produit in ViewBag.Produits)
+                    {
+                        <option value="@produit.IdProduit"
+                                data-prix="@produit.PrixUnitaire"
+                                data-stock="@produit.QuantiteStock"
+                                data-categorie="@produit.Categorie.Nom">
+                            @produit.Libelle
+                        </option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Quantité *</label>
+                <input type="number" class="form-control quantite-input" name="Lignes[INDEX].Quantite" min="1" required />
+                <small class="text-muted stock-info"></small>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Prix unitaire *</label>
+                <input type="number" class="form-control prix-input" name="Lignes[INDEX].PrixUnitaire" step="0.01" min="0.01" required />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Total</label>
+                <input type="text" class="form-control total-ligne" readonly />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">&nbsp;</label>
+                <div>
+                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeLigne(this)">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-md-12">
+                <small class="text-muted produit-info"></small>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    let ligneIndex = 0;
+    const existingLignes = @Html.Raw(Json.Serialize(Model.Lignes));
+
+    function addLigne(existingData = null) {
+        const template = document.getElementById('ligneTemplate');
+        const container = document.getElementById('lignesContainer');
+        const noMessage = document.getElementById('noLignesMessage');
+
+        let html = template.innerHTML.replace(/INDEX/g, ligneIndex);
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        const clone = tempDiv.firstElementChild;
+
+        container.appendChild(clone);
+
+        // Si on a des données existantes, les pré-remplir
+        if (existingData) {
+            const produitSelect = clone.querySelector('.produit-select');
+            const quantiteInput = clone.querySelector('.quantite-input');
+            const prixInput = clone.querySelector('.prix-input');
+
+            produitSelect.value = existingData.idProduit;
+            quantiteInput.value = existingData.quantite;
+            prixInput.value = existingData.prixUnitaire;
+
+            // Déclencher l'événement change pour mettre à jour les infos
+            produitSelect.dispatchEvent(new Event('change'));
+        }
+
+        ligneIndex++;
+        noMessage.style.display = 'none';
+        attachEvents();
+        updateSummary();
+    }
+
+    function removeLigne(button) {
+        const ligne = button.closest('.ligne-item');
+        ligne.remove();
+
+        const container = document.getElementById('lignesContainer');
+        const noMessage = document.getElementById('noLignesMessage');
+
+        if (container.children.length === 0) {
+            noMessage.style.display = 'block';
+        }
+
+        updateSummary();
+    }
+
+    function attachEvents() {
+        // Événements pour les selects de produits
+        document.querySelectorAll('.produit-select').forEach(select => {
+            if (!select.hasAttribute('data-events-attached')) {
+                select.setAttribute('data-events-attached', 'true');
+                select.addEventListener('change', function() {
+                    const option = this.options[this.selectedIndex];
+                    const ligne = this.closest('.ligne-item');
+
+                    if (option.value) {
+                        const prix = parseFloat(option.dataset.prix);
+                        const stock = parseInt(option.dataset.stock);
+                        const categorie = option.dataset.categorie;
+
+                        const prixInput = ligne.querySelector('.prix-input');
+                        if (!prixInput.value) {
+                            prixInput.value = prix.toFixed(2);
+                        }
+
+                        ligne.querySelector('.stock-info').textContent = `Stock: ${stock}`;
+                        ligne.querySelector('.produit-info').textContent = `Catégorie: ${categorie}`;
+
+                        // Définir la quantité maximale selon le type de bon
+                        const quantiteInput = ligne.querySelector('.quantite-input');
+                        if ('@Model.TypeBon' === 'BS' || '@Model.TypeBon' === 'BRF') {
+                            quantiteInput.max = stock;
+                            quantiteInput.title = `Stock disponible: ${stock}`;
+                        }
+                    } else {
+                        ligne.querySelector('.stock-info').textContent = '';
+                        ligne.querySelector('.produit-info').textContent = '';
+                    }
+
+                    updateLigneTotal(ligne);
+                });
+            }
+        });
+
+        // Événements pour les quantités et prix
+        document.querySelectorAll('.quantite-input, .prix-input').forEach(input => {
+            if (!input.hasAttribute('data-events-attached')) {
+                input.setAttribute('data-events-attached', 'true');
+                input.addEventListener('input', function() {
+                    const ligne = this.closest('.ligne-item');
+                    updateLigneTotal(ligne);
+                });
+            }
+        });
+    }
+
+    function updateLigneTotal(ligne) {
+        const quantite = parseFloat(ligne.querySelector('.quantite-input').value) || 0;
+        const prix = parseFloat(ligne.querySelector('.prix-input').value) || 0;
+        const total = quantite * prix;
+
+        ligne.querySelector('.total-ligne').value = total.toFixed(2) + ' DH';
+        updateSummary();
+    }
+
+    function updateSummary() {
+        const lignes = document.querySelectorAll('.ligne-item');
+        let totalArticles = lignes.length;
+        let totalQuantite = 0;
+        let totalMontant = 0;
+
+        lignes.forEach(ligne => {
+            const quantite = parseFloat(ligne.querySelector('.quantite-input').value) || 0;
+            const prix = parseFloat(ligne.querySelector('.prix-input').value) || 0;
+
+            totalQuantite += quantite;
+            totalMontant += quantite * prix;
+        });
+
+        document.getElementById('totalArticles').textContent = totalArticles;
+        document.getElementById('totalQuantite').textContent = totalQuantite;
+        document.getElementById('totalMontant').textContent = totalMontant.toFixed(2) + ' DH';
+
+        // Activer/désactiver le bouton de soumission
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = totalArticles === 0;
+    }
+
+    // Initialiser avec les lignes existantes
+    document.addEventListener('DOMContentLoaded', function() {
+        if (existingLignes && existingLignes.length > 0) {
+            existingLignes.forEach(ligne => {
+                addLigne(ligne);
+            });
+        } else {
+            addLigne();
+        }
+    });
+
+    // Validation avant soumission
+    document.getElementById('bonForm').addEventListener('submit', function(e) {
+        const lignes = document.querySelectorAll('.ligne-item');
+        let isValid = true;
+
+        lignes.forEach(ligne => {
+            const produitSelect = ligne.querySelector('.produit-select');
+            const quantiteInput = ligne.querySelector('.quantite-input');
+            const prixInput = ligne.querySelector('.prix-input');
+
+            if (!produitSelect.value || !quantiteInput.value || !prixInput.value) {
+                isValid = false;
+                return;
+            }
+
+            // Vérifier le stock pour les sorties
+            if ('@Model.TypeBon' === 'BS' || '@Model.TypeBon' === 'BRF') {
+                const stock = parseInt(produitSelect.options[produitSelect.selectedIndex].dataset.stock);
+                const quantite = parseInt(quantiteInput.value);
+
+                if (quantite > stock) {
+                    alert(`Stock insuffisant pour ${produitSelect.options[produitSelect.selectedIndex].text}. Stock disponible: ${stock}`);
+                    isValid = false;
+                    return;
+                }
+            }
+        });
+
+        if (!isValid) {
+            e.preventDefault();
+            alert('Veuillez remplir tous les champs obligatoires et vérifier les stocks.');
+            return;
+        }
+
+        // Confirmation avant modification
+        if (!confirm('Êtes-vous sûr de vouloir modifier ce bon ? Cette action affectera les stocks.')) {
+            e.preventDefault();
+        }
+    });
+</script>
+
+<style>
+    .ligne-item {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        transition: all 0.3s ease;
+    }
+
+    .ligne-item:hover {
+        border-color: #007bff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .produit-info {
+        font-style: italic;
+    }
+
+    .stock-info {
+        font-weight: 500;
+    }
+
+    .alert-warning {
+        border-left: 4px solid #ffc107;
+    }
+</style>

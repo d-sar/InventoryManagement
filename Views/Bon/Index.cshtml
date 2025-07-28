@@ -214,7 +214,7 @@
                             <tr>
                                 <td><span class="badge @currentConfig.Item2">@currentConfig.Item3-@bon.Numero.ToString("D4")</span></td>
                                 <td>@bon.Date.ToString("dd/MM/yyyy")</td>
-                                <td>@bon.Partenaire.Nom @bon.Partenaire.Nom</td>
+                                <td>@bon.Partenaire.Nom</td>
                                 <td>@bon.LignesBon.Count</td>
                                 <td>@bon.LignesBon.Sum(l => l.Quantite)</td>
                                 <td>@bon.CalculerTotal().ToString("C")</td>
@@ -223,9 +223,13 @@
                                         <a asp-action="Details" asp-route-id="@bon.IdBon" asp-route-type="@Model.TypeBon" class="btn btn-sm btn-outline-primary btn-action">
                                             <i class="fas fa-eye"></i>
                                         </a>
+                                        <a asp-action="Edit" asp-route-id="@bon.IdBon" asp-route-type="@Model.TypeBon" class="btn btn-sm btn-outline-primary btn-action">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
                                         <a asp-action="ExportToPdf" asp-route-id="@bon.IdBon" asp-route-type="@Model.TypeBon" class="btn btn-sm btn-outline-success btn-action">
                                             <i class="fas fa-file-pdf"></i>
                                         </a>
+                                        
                                         <button type="button" class="btn btn-sm btn-outline-danger btn-action" onclick="confirmDelete(@bon.IdBon, '@currentConfig.Item3-@bon.Numero.ToString("D4")')">
                                             <i class="fas fa-trash"></i>
                                         </button>

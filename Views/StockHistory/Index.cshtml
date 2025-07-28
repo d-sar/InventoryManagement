@@ -214,10 +214,10 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label class="form-label">
-                            <i class="fas fa-box"></i> Produit
+                                <i class="fas fa-box"></i> Produit
                         </label>
-                        <select name="idProduit" class="form-control" required>
-                            <option value="">-- Choisir un produit --</option>
+                            <select name="idProduit" class="form-control form-select " required>
+                                <option value="">-- Choisir un produit --</option> 
                             @foreach (var produit in ViewBag.Produits)
                             {
                                 <option value="@produit.IdProduit" selected="@(query["idProduit"] == produit.IdProduit.ToString() ? "selected" : null)">

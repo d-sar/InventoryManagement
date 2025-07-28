@@ -293,5 +293,101 @@ namespace InventoryManagementMVC.Controllers
             ViewBag.TitrePage = $"Nouveau {config.titre.TrimEnd('s')}";
             ViewBag.TypePartenaire = config.partenaire;
         }
+
+        public async Task<IActionResult> Edit(int id, string type = "BE")
+        {
+            if (!_bonConfig.ContainsKey(type))
+            {
+                TempData["ErrorMessage"] = "Type de bon invalide";
+                return RedirectToAction("Index");
+            }
+
+            var bon = await _bonService.GetBonForEditAsync(id);
+            if (bon == null)
+            {
+                TempData["ErrorMessage"] = "Bon introuvable";
+                return RedirectToAction(nameof(Index), new { type });
+            }
+
+            var viewModel = new BonCreateViewModel
+            {
+                PartenaireId = bon.IdUser,
+                TypeBon = type,
+                Date = bon.Date,
+                Lignes = bon.LignesBon.Select(l => new LigneBonViewModel
+                {
+                    IdProduit = l.IdProduit,
+                    Quantite = l.Quantite,
+                    PrixUnitaire = l.PrixUnitaire
+                }).ToList()
+            };
+
+            await PrepareEditViewData(type, id);
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, BonCreateViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                await PrepareEditViewData(model.TypeBon, id);
+                return View(model);
+            }
+
+            try
+            {
+                var  Lignes = model.Lignes.Select(l => new LigneBon
+                {
+                    IdProduit = l.IdProduit,
+                    Quantite = l.Quantite,
+                    PrixUnitaire = l.PrixUnitaire
+                }).ToList();
+
+                var success = await _bonService.UpdateBonAsync(id, model.TypeBon, model.PartenaireId,model.Date,  Lignes);
+
+                if (success)
+                {
+                    TempData["SuccessMessage"] = $"{_bonConfig[model.TypeBon].titre.TrimEnd('s')} modifié avec succès";
+                    return RedirectToAction(nameof(Details), new { id, type = model.TypeBon });
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Bon introuvable");
+                    await PrepareEditViewData(model.TypeBon, id);
+                    return View(model);
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Erreur lors de la modification : {ex.Message}");
+                await PrepareEditViewData(model.TypeBon, id);
+                return View(model);
+            }
+        }
+
+        private async Task PrepareEditViewData(string type, int bonId)
+        {
+            var config = _bonConfig[type];
+
+            ViewBag.Partenaires = await _context.User
+                .Where(u => u.Type == config.partenaire)
+                .OrderBy(u => u.Nom)
+                .ToListAsync();
+
+            ViewBag.Produits = await _context.Produits
+                .Include(p => p.Categorie)
+                .Where(p => p.IsActive)
+                .OrderBy(p => p.Libelle)
+                .ToListAsync();
+
+            ViewBag.TypeBon = type;
+            ViewBag.TitrePage = $"Modifier {config.titre.TrimEnd('s')}";
+            ViewBag.TypePartenaire = config.partenaire;
+            ViewBag.BonId = bonId;
+            ViewBag.IsEdit = true;
+        }
+
     }
 }
