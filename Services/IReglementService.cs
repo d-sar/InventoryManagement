@@ -15,5 +15,6 @@ namespace InventoryManagementMVC.Services
         Task<Reglement?> GetReglementByIdAsync(int id);
         Task<List<Reglement>> GetReglementsByPartenaireAsync(int partenaireId);
         Task<ReglementStats> GetStatsAsync(ReglementFilters filters);
+        Task<List<User>> GetPartenairesAsync();
     }
 }

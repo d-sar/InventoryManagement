@@ -1,0 +1,268 @@
+﻿@using InventoryManagementMVC.Models.Entities
+@using InventoryManagementMVC.Models.ViewModels.gestiondesReglements
+@model ReglementCreateEditViewModel
+
+@{
+    ViewData["Title"] = Model.ActionTitle;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>
+        <i class="fas fa-@(Model.IsEdit ? "edit" : "plus") me-2 text-primary"></i>
+        @Model.ActionTitle
+    </h2>
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>Informations du règlement
+                </h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="@(Model.IsEdit ? "Edit" : "Create")" method="post">
+                    @if (Model.IsEdit)
+                    {
+                        <input asp-for="Reglement.IdReglement" type="hidden" />
+                    }
+
+                    <div class="row">
+                        <!-- Partenaire -->
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Reglement.IdUser" class="form-label required">
+                                <i class="fas fa-user me-1"></i>@Model.TypePartenaire
+                            </label>
+                            <select asp-for="Reglement.IdUser" class="form-select" required>
+                                <option value="">Sélectionnez un @Model.TypePartenaire.ToLower()</option>
+                                @foreach (var partenaire in Model.Partenaires)
+                                {
+                                    <option value="@partenaire.Id">
+                                        @partenaire.Nom
+                                        @if (partenaire is Client)
+                                        {
+                                            <span> (Client)</span>
+                                        }
+                                        else
+                                        {
+                                            <span> (Fournisseur)</span>
+                                        }
+                                    </option>
+                                }
+                            </select>
+                            <span asp-validation-for="Reglement.IdUser" class="text-danger"></span>
+                        </div>
+
+                        <!-- Date de paiement -->
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Reglement.DatePaiement" class="form-label required">
+                                <i class="fas fa-calendar me-1"></i>Date de paiement
+                            </label>
+                            <input asp-for="Reglement.DatePaiement" type="date" class="form-control" required />
+                            <span asp-validation-for="Reglement.DatePaiement" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Montant -->
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Reglement.Montant" class="form-label required">
+                                <i class="fas fa-euro-sign me-1"></i>Montant
+                            </label>
+                            <div class="input-group">
+                                <input asp-for="Reglement.Montant" type="number" step="0.01" min="0.01" class="form-control" placeholder="0.00" required />
+                                <span class="input-group-text">€</span>
+                            </div>
+                            <span asp-validation-for="Reglement.Montant" class="text-danger"></span>
+                        </div>
+
+                        <!-- Mode de paiement -->
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Reglement.ModePaiement" class="form-label required">
+                                <i class="fas fa-credit-card me-1"></i>Mode de paiement
+                            </label>
+                            <select asp-for="Reglement.ModePaiement" class="form-select" required>
+                                <option value="">Sélectionnez un mode</option>
+                                @foreach (ModePaiement mode in Enum.GetValues<ModePaiement>())
+                                {
+                                    <option value="@mode">
+                                        @switch (mode)
+                                        {
+                                            case ModePaiement.Especes:
+                                                <span>💵 @Html.DisplayFor(m => mode)</span>
+                                                break;
+                                            case ModePaiement.Cheque:
+                                                <span>📄 @Html.DisplayFor(m => mode)</span>
+                                                break;
+                                            case ModePaiement.Effet:
+                                                <span>📋 @Html.DisplayFor(m => mode)</span>
+                                                break;
+                                            case ModePaiement.VirementBancaire:
+                                                <span>🏦 @Html.DisplayFor(m => mode)</span>
+                                                break;
+                                        }
+                                    </option>
+                                }
+                            </select>
+                            <span asp-validation-for="Reglement.ModePaiement" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <!-- Numéro de paiement -->
+                    <div class="mb-3">
+                        <label asp-for="Reglement.NumeroPaiement" class="form-label">
+                            <i class="fas fa-hashtag me-1"></i>Numéro de paiement
+                        </label>
+                        <input asp-for="Reglement.NumeroPaiement" type="text" class="form-control" placeholder="Ex: CHQ001234, VIR789456..." />
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Numéro de chèque, référence de virement, etc. (facultatif)
+                        </div>
+                        <span asp-validation-for="Reglement.NumeroPaiement" class="text-danger"></span>
+                    </div>
+
+                    <!-- Note/Remarque -->
+                    <div class="mb-4">
+                        <label asp-for="Reglement.Note" class="form-label">
+                            <i class="fas fa-sticky-note me-1"></i>Note / Remarque
+                        </label>
+                        <textarea asp-for="Reglement.Note" class="form-control" rows="3" placeholder="Ajoutez des informations complémentaires..."></textarea>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Conditions particulières, délais, observations... (facultatif)
+                        </div>
+                        <span asp-validation-for="Reglement.Note" class="text-danger"></span>
+                    </div>
+
+                    <!-- Boutons d'action -->
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-1"></i>Annuler
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-@(Model.IsEdit ? "save" : "plus") me-1"></i>
+                            @(Model.IsEdit ? "Modifier" : "Créer") le règlement
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel d'aide -->
+    <div class="col-lg-4">
+        <div class="card border-info">
+            <div class="card-header bg-info text-white">
+                <h6 class="mb-0">
+                    <i class="fas fa-lightbulb me-2"></i>Aide
+                </h6>
+            </div>
+            <div class="card-body">
+                <h6><i class="fas fa-user-tie me-2 text-primary"></i>Partenaire</h6>
+                <p class="small text-muted mb-3">Sélectionnez le client ou fournisseur concerné par ce règlement.</p>
+
+                <h6><i class="fas fa-calendar me-2 text-success"></i>Date</h6>
+                <p class="small text-muted mb-3">Date effective du paiement (peut être différente de la date de saisie).</p>
+
+                <h6><i class="fas fa-euro-sign me-2 text-warning"></i>Montant</h6>
+                <p class="small text-muted mb-3">Montant exact du règlement en euros.</p>
+
+                <h6><i class="fas fa-credit-card me-2 text-info"></i>Mode de paiement</h6>
+                <ul class="small text-muted mb-3">
+                    <li><strong>Espèces :</strong> Paiement en liquide</li>
+                    <li><strong>Chèque :</strong> Paiement par chèque</li>
+                    <li><strong>Effet :</strong> Lettre de change, billet à ordre</li>
+                    <li><strong>Virement :</strong> Transfert bancaire</li>
+                </ul>
+
+                <div class="alert alert-warning alert-sm">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <small>Vérifiez bien les informations avant validation.</small>
+                </div>
+            </div>
+        </div>
+
+        @if (Model.IsEdit)
+        {
+            <div class="card border-secondary mt-3">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Informations
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <p class="small">
+                        <strong>Créé le :</strong> @Model.Reglement.DateCreation.ToString("dd/MM/yyyy à HH:mm")
+                    </p>
+                    <p class="small mb-0">
+                        <strong>ID :</strong> #@Model.Reglement.IdReglement
+                    </p>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .required::after {
+        content: " *";
+        color: #dc3545;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+
+    .alert-sm {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+    }
+
+    .card {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        border-radius: 0.5rem;
+    }
+
+    .card-header {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+        background-color: rgba(13, 110, 253, 0.03);
+    }
+</style>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Auto-update numero paiement based on mode
+        document.getElementById('Reglement_ModePaiement').addEventListener('change', function() {
+            const numeroInput = document.getElementById('Reglement_NumeroPaiement');
+            const mode = this.value;
+
+            if (numeroInput.value === '') {
+                switch(mode) {
+                    case '1': // Especes
+                        numeroInput.placeholder = 'Ex: ESP001, CASH123...';
+                        break;
+                    case '2': // Cheque
+                        numeroInput.placeholder = 'Ex: CHQ001234, 1234567...';
+                        break;
+                    case '3': // Effet
+                        numeroInput.placeholder = 'Ex: LCR001, BOR456...';
+                        break;
+                    case '4': // Virement
+                        numeroInput.placeholder = 'Ex: VIR789456, REF123...';
+                        break;
+                    default:
+                        numeroInput.placeholder = 'Numéro ou référence...';
+                }
+            }
+        });
+    </script>
+}

@@ -212,6 +212,33 @@
                     </div>
                 }
             </div>
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-balance-scale-right me-2"></i>Situation Financière
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>Total à payer :</strong><br />
+                            <span>@Model.Result.TotalGeneral.ToString("N2") DH</span>
+
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Total réglé :</strong><br />
+                            <span>@Model.Result.TotalReglements.ToString("N2") DH</span>
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Reste à payer :</strong><br />
+                            <span class="fw-bold @(Model.Result.ResteAPayer > 0 ? "text-danger" : "text-success")">
+                                @Model.Result.ResteAPayer.ToString("N2") DH
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         }
     </div>
 

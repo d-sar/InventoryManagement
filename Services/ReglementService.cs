@@ -216,6 +216,11 @@ namespace InventoryManagementMVC.Services
 
             return stats;
         }
+        public async Task<List<User>> GetPartenairesAsync()
+        {
+            return await _context.User.OrderBy(p => p.Nom).ToListAsync();
+        }
+
     }
 }
  

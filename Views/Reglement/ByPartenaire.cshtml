@@ -1,0 +1,11 @@
+﻿@using InventoryManagementMVC.Models.Entities
+@model List<Reglement>
+@{
+    ViewData["Title"] = "Règlements du Partenaire";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // s'assurer que le layout est bien appliqué
+}
+
+<h2 class="mb-4"><i class="fas fa-user-friends me-2"></i>Règlements du Partenaire</h2>
+
+<!-- Inclure la vue partielle ici -->
+@Html.Partial("_ReglementsList", Model)

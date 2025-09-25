@@ -88,6 +88,18 @@ namespace InventoryManagementMVC.Services
                 EstPositif = DeterminerSiPositif(b.DocType.Type, partenaire.Type)
             }).ToList();
 
+            // mantant a paye
+            var totalDocuments = documents
+            .Where(d => d.EstPositif)
+            .Sum(d => d.Montant);
+
+            var totalReglements = await _context.Reglements
+                .Where(r => r.IdUser == partenaireId &&
+                            r.DatePaiement >= (dateDebut ?? DateTime.MinValue) &&
+                            r.DatePaiement <= (dateFin ?? DateTime.MaxValue))
+                .SumAsync(r => r.Montant);
+
+
             // Calculer le total en fonction du type de document et partenaire
             var totalGeneral = CalculerTotalGeneral(documents);
 
@@ -96,6 +108,8 @@ namespace InventoryManagementMVC.Services
                 Partenaire = partenaire,
                 Documents = documents,
                 TotalGeneral = totalGeneral,
+                TotalDocuments = totalDocuments,
+                TotalReglements = totalReglements,
                 DateDebut = dateDebut ?? DateTime.MinValue,
                 DateFin = dateFin ?? DateTime.MaxValue
             };

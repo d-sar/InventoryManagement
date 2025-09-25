@@ -1,0 +1,382 @@
+﻿@using InventoryManagementMVC.Models
+@using InventoryManagementMVC.Models.Entities
+@using InventoryManagementMVC.Models.ViewModels.gestiondesReglements
+
+@model ReglementIndexViewModel
+
+@{
+    ViewData["Title"] = Model.TitrePage;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>
+        <i class="fas fa-credit-card me-2 text-primary"></i>
+        @Model.TitrePage
+    </h2>
+
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="fas fa-plus me-1"></i>Nouveau Règlement
+    </a>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+<!--
+<!-- Statistiques 
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white stats-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="mb-0">@Model.Stats.NombreReglements</h4>
+                        <small>Règlements</small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-file-invoice fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card border-success stats-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="mb-0 text-success">@Model.Stats.MontantTotal.ToString("C")</h4>
+                        <small class="text-muted">Montant total</small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-euro-sign fa-2x text-success opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card border-info stats-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+<div>
+                        <h4 class="mb-0 text-info">@Model.Stats.MoyenneParReglement.ToString("C")</h4>
+                        <small class="text-muted">Moyenne</small>
+</div>
+                    <div class="align-self-center">
+                        <i class="fas fa-chart-line fa-2x text-info opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card border-warning stats-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="mb-0 text-warning">
+                            @if (Model.Stats.RepartitionParMode.Any())
+                            {
+                                var modeTop = Model.Stats.RepartitionParMode.OrderByDescending(x => x.Value).First();
+                                @Html.DisplayFor(m => modeTop.Key)
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </h4>
+                        <small class="text-muted">Mode préféré</small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-trophy fa-2x text-warning opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>  -->
+
+<!-- Filtres -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="fas fa-filter me-2"></i>Filtres
+            <button class="btn btn-sm btn-outline-secondary ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#filtersCollapse">
+                <i class="fas fa-chevron-down"></i>
+            </button>
+        </h5>
+    </div>
+    <div class="collapse show" id="filtersCollapse">
+        <div class="card-body">
+            <form method="get" asp-action="Index">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label asp-for="Filters.PartenaireId" class="form-label">@Model.TypePartenaire</label>
+                        <select asp-for="Filters.PartenaireId" class="form-select">
+                            <option value="">Tous les partenaires</option>
+                            @foreach (var partenaire in Model.Partenaires)
+                            {
+                                <option value="@partenaire.Id">@partenaire.Nom</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label asp-for="Filters.DateDebut" class="form-label">Date début</label>
+                        <input asp-for="Filters.DateDebut" type="date" class="form-control" />
+                    </div>
+                    <div class="col-md-2">
+                        <label asp-for="Filters.DateFin" class="form-label">Date fin</label>
+                        <input asp-for="Filters.DateFin" type="date" class="form-control" />
+                    </div>
+                    <div class="col-md-2">
+                        <label asp-for="Filters.ModePaiement" class="form-label">Mode</label>
+                        <select asp-for="Filters.ModePaiement" class="form-select">
+                            <option value="">Tous les modes</option>
+                            @foreach (ModePaiement mode in Enum.GetValues<ModePaiement>())
+                            {
+                                <option value="@mode">@Html.DisplayFor(m => mode)</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary me-2">
+                            <i class="fas fa-search"></i> Filtrer
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i> Effacer
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Filtres min max
+                <div class="row mt-3">
+                    <div class="col-md-2">
+                        <label asp-for="Filters.MontantMin" class="form-label">Montant min.</label>
+                        <input asp-for="Filters.MontantMin" type="number" step="0.01" class="form-control" placeholder="0.00" />
+                    </div>
+                    <div class="col-md-2">
+                        <label asp-for="Filters.MontantMax" class="form-label">Montant max.</label>
+                        <input asp-for="Filters.MontantMax" type="number" step="0.01" class="form-control" placeholder="999999.99" />
+                    </div>
+                </div> -->
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Liste des règlements -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="fas fa-list me-2"></i>Liste des Règlements
+            <span class="badge bg-primary ms-2">@Model.Reglements.Count</span>
+        </h5>
+    </div>
+    <div class="card-body p-0">
+        @if (Model.Reglements.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Tiers</th>
+                            <th>Montant</th>
+                            <th>Mode</th>
+                            <th>N° Paiement</th>
+                            <th>Note</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var reglement in Model.Reglements)
+                        {
+                            <tr>
+                                <td>@reglement.DatePaiement.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        @if (reglement.Partenaire is Client)
+                                        {
+                                            <span class="badge bg-success me-2">C</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning me-2">F</span>
+                                        }
+                                        @reglement.Partenaire.Nom
+                                    </div>
+                                </td>
+                                <td class="fw-bold text-success">@reglement.Montant.ToString("C")</td>
+                                <td>
+                                    @switch (reglement.ModePaiement)
+                                    {
+                                        case ModePaiement.Especes:
+                                            <span class="badge bg-success"><i class="fas fa-money-bill-wave me-1"></i>@Html.DisplayFor(m => reglement.ModePaiement)</span>
+                                            break;
+                                        case ModePaiement.Cheque:
+                                            <span class="badge bg-primary"><i class="fas fa-money-check me-1"></i>@Html.DisplayFor(m => reglement.ModePaiement)</span>
+                                            break;
+                                        case ModePaiement.Effet:
+                                            <span class="badge bg-warning"><i class="fas fa-file-invoice me-1"></i>@Html.DisplayFor(m => reglement.ModePaiement)</span>
+                                            break;
+                                        case ModePaiement.VirementBancaire:
+                                            <span class="badge bg-info"><i class="fas fa-university me-1"></i>@Html.DisplayFor(m => reglement.ModePaiement)</span>
+                                            break;
+                                    }
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(reglement.NumeroPaiement))
+                                    {
+                                        <code class="text-muted">@reglement.NumeroPaiement</code>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(reglement.Note))
+                                    {
+                                        var noteShort = reglement.Note.Length > 30 ? reglement.Note.Substring(0, 30) + "..." : reglement.Note;
+                                        <span title="@reglement.Note">@noteShort</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a asp-action="Details" asp-route-id="@reglement.IdReglement" class="btn btn-sm btn-outline-primary btn-action">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@reglement.IdReglement" class="btn btn-sm btn-outline-primary btn-action">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-outline-danger btn-action" onclick="confirmDelete(@reglement.IdReglement, '@reglement.Partenaire.Nom', '@reglement.DatePaiement.ToString("dd/MM/yyyy")')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-credit-card fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">Aucun règlement trouvé</h5>
+                <p class="text-muted">Commencez par enregistrer votre premier règlement</p>
+                <a asp-action="Create" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>Nouveau Règlement
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Modal de suppression -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer le règlement de <strong id="partenaireToDelete"></strong> du <strong id="dateToDelete"></strong> ?</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Cette action ne pourra pas être annulée.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form method="post" asp-action="Delete" id="deleteForm">
+                    <input type="hidden" name="id" id="deleteId" />
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i>Supprimer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .stats-card {
+        transition: transform 0.2s;
+        border-radius: 10px;
+    }
+
+        .stats-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+    .btn-action {
+        border: none;
+        margin: 0 1px;
+    }
+
+        .btn-action:hover {
+            transform: scale(1.1);
+        }
+
+    .table th {
+        border-bottom: 2px solid #dee2e6;
+        font-weight: 600;
+        color: #495057;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .badge {
+        font-size: 0.75em;
+    }
+</style>
+
+<script>
+    function confirmDelete(reglementId, partenaireNom, datePaiement) {
+        document.getElementById('deleteId').value = reglementId;
+        document.getElementById('partenaireToDelete').textContent = partenaireNom;
+        document.getElementById('dateToDelete').textContent = datePaiement;
+        new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    }
+
+    // Auto-collapse filters after 3 seconds if no interaction
+    setTimeout(function() {
+        const filtersCollapse = document.getElementById('filtersCollapse');
+        if (filtersCollapse && filtersCollapse.classList.contains('show')) {
+            // Check if any filter has a value
+            const hasFilters = document.querySelectorAll('#filtersCollapse input, #filtersCollapse select').forEach(function(input) {
+                return input.value !== '';
+            });
+
+            if (!hasFilters) {
+                new bootstrap.Collapse(filtersCollapse, { toggle: false }).hide();
+            }
+        }
+    }, 3000);
+</script>

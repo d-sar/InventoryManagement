@@ -22,6 +22,7 @@ builder.Services.AddScoped<StockHistoryService>();
 builder.Services.AddScoped<StockGlobalService>();
 builder.Services.AddScoped<StockValoriseService>();
 builder.Services.AddScoped<ISituationPartenairesService, SituationPartenairesService>();
+builder.Services.AddScoped<IReglementService, ReglementService>();
 
 // Configuration MVC
 builder.Services.AddControllersWithViews();

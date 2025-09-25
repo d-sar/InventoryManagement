@@ -1,0 +1,383 @@
+﻿@using InventoryManagementMVC.Models.Entities
+@using InventoryManagementMVC.Models.ViewModels.gestiondesReglements
+@model ReglementStats
+
+<div class="row mb-4">
+    <!-- Nombre de règlements -->
+    <div class="col-md-3 mb-3">
+        <div class="card bg-primary text-white stats-card h-100">
+            <div class="card-body d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <div class="stats-number">@Model.NombreReglements</div>
+                    <div class="stats-label">Règlements</div>
+                    <div class="stats-sublabel">Total enregistrés</div>
+                </div>
+                <div class="stats-icon">
+                    <i class="fas fa-file-invoice fa-2x opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Montant total -->
+    <div class="col-md-3 mb-3">
+        <div class="card border-success stats-card h-100">
+            <div class="card-body d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <div class="stats-number text-success">@Model.MontantTotal.ToString("C")</div>
+                    <div class="stats-label text-muted">Montant total</div>
+                    <div class="stats-sublabel text-muted">Tous règlements</div>
+                </div>
+                <div class="stats-icon">
+                    <i class="fas fa-euro-sign fa-2x text-success opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Moyenne par règlement -->
+    <div class="col-md-3 mb-3">
+        <div class="card border-info stats-card h-100">
+            <div class="card-body d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <div class="stats-number text-info">@Model.MoyenneParReglement.ToString("C")</div>
+                    <div class="stats-label text-muted">Moyenne</div>
+                    <div class="stats-sublabel text-muted">Par règlement</div>
+                </div>
+                <div class="stats-icon">
+                    <i class="fas fa-chart-line fa-2x text-info opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mode de paiement le plus utilisé -->
+    <div class="col-md-3 mb-3">
+        <div class="card border-warning stats-card h-100">
+            <div class="card-body d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <div class="stats-number text-warning">
+                        @if (Model.RepartitionParMode.Any())
+                        {
+                            var modeTop = Model.RepartitionParMode.OrderByDescending(x => x.Value).First();
+                            @switch (modeTop.Key)
+                            {
+                                case ModePaiement.Especes:
+                                    <i class="fas fa-money-bill-wave me-1"></i>
+                                    break;
+                                case ModePaiement.Cheque:
+                                    <i class="fas fa-money-check me-1"></i>
+                                    break;
+                                case ModePaiement.Effet:
+                                    <i class="fas fa-file-invoice me-1"></i>
+                                    break;
+                                case ModePaiement.VirementBancaire:
+                                    <i class="fas fa-university me-1"></i>
+                                    break;
+                            }
+                            @Html.DisplayFor(m => modeTop.Key)
+                        }
+                        else
+                        {
+                            <span>-</span>
+                        }
+                    </div>
+                    <div class="stats-label text-muted">Mode préféré</div>
+                    <div class="stats-sublabel text-muted">
+                        @if (Model.RepartitionParMode.Any())
+                        {
+                            var modeTop = Model.RepartitionParMode.OrderByDescending(x => x.Value).First();
+                            @modeTop.Value.ToString("C")
+                        }
+                        else
+                        {
+                            <span>Aucun mode</span>
+                        }
+                    </div>
+                </div>
+                <div class="stats-icon">
+                    <i class="fas fa-trophy fa-2x text-warning opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Répartition détaillée par mode de paiement -->
+@if (Model.RepartitionParMode.Any())
+{
+    <div class="card mb-4">
+        <div class="card-header">
+            <h6 class="mb-0">
+                <i class="fas fa-chart-pie me-2"></i>Répartition par mode de paiement
+            </h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                @foreach (var mode in Model.RepartitionParMode.OrderByDescending(x => x.Value))
+                {
+                    var percentage = Model.MontantTotal > 0 ? (mode.Value / Model.MontantTotal * 100) : 0;
+
+                    <div class="col-md-6 col-lg-3 mb-3">
+                        <div class="mode-stat-card">
+                            <div class="d-flex align-items-center mb-2">
+                                @switch (mode.Key)
+                                {
+                                    case ModePaiement.Especes:
+                                        <div class="mode-icon bg-success">
+                                            <i class="fas fa-money-bill-wave text-white"></i>
+                                        </div>
+                                        break;
+                                    case ModePaiement.Cheque:
+                                        <div class="mode-icon bg-primary">
+                                            <i class="fas fa-money-check text-white"></i>
+                                        </div>
+                                        break;
+                                    case ModePaiement.Effet:
+                                        <div class="mode-icon bg-warning">
+                                            <i class="fas fa-file-invoice text-white"></i>
+                                        </div>
+                                        break;
+                                    case ModePaiement.VirementBancaire:
+                                        <div class="mode-icon bg-info">
+                                            <i class="fas fa-university text-white"></i>
+                                        </div>
+                                        break;
+                                }
+                                <div class="ms-3 flex-grow-1">
+                                    <div class="fw-semibold">@Html.DisplayFor(m => mode.Key)</div>
+                                    <div class="text-success fw-bold">@mode.Value.ToString("C")</div>
+                                </div>
+                            </div>
+
+                            <!-- Barre de progression -->
+                            <div class="progress mb-2" style="height: 8px;">
+                                <div class="progress-bar @GetProgressBarClass(mode.Key)"
+                                     role="progressbar"
+                                     style="width: @percentage.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)%"
+                                     aria-valuenow="@percentage.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)"
+                                     aria-valuemin="0"
+                                     aria-valuemax="100">
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between small text-muted">
+                                <span>@percentage.ToString("F1")%</span>
+                                <span>du total</span>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Graphique en secteurs (simple version CSS) -->
+@if (Model.RepartitionParMode.Any())
+{
+    <div class="card">
+        <div class="card-header">
+            <h6 class="mb-0">
+                <i class="fas fa-chart-donut me-2"></i>Visualisation graphique
+            </h6>
+        </div>
+        <div class="card-body text-center">
+            <div class="pie-chart-container">
+                <!-- Graphique simple en CSS -->
+                <div class="pie-chart">
+                    @{
+                        var sortedModes = Model.RepartitionParMode.OrderByDescending(x => x.Value).ToList();
+                        var cumulativePercentage = 0.0;
+                    }
+
+                    @foreach (var mode in sortedModes)
+                    {
+                        var percentage = Model.MontantTotal > 0 ? (double)(mode.Value / Model.MontantTotal * 100) : 0;
+                        var color = GetModeColor(mode.Key);
+
+                        <div class="pie-slice"
+                             style="--percentage: @percentage.ToString("F1", System.Globalization.CultureInfo.InvariantCulture); --color: @color; --start: @cumulativePercentage.ToString("F1", System.Globalization.CultureInfo.InvariantCulture);">
+                        </div>
+
+                        cumulativePercentage += percentage;
+                    }
+                </div>
+
+                <!-- Légende -->
+                <div class="pie-legend mt-3">
+                    @foreach (var mode in sortedModes)
+                    {
+                        var percentage = Model.MontantTotal > 0 ? (mode.Value / Model.MontantTotal * 100) : 0;
+
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: @GetModeColor(mode.Key);"></span>
+                            <span class="legend-text">
+                                @Html.DisplayFor(m => mode.Key)
+                                <strong>(@percentage.ToString("F1")%)</strong>
+                            </span>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Résumé textuel -->
+            <div class="mt-4 p-3 bg-light rounded">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <div class="fw-bold text-primary fs-4">@Model.NombreReglements</div>
+                        <div class="small text-muted">Règlements</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="fw-bold text-success fs-4">@Model.MontantTotal.ToString("C")</div>
+                        <div class="small text-muted">Total</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="fw-bold text-info fs-4">@Model.RepartitionParMode.Count</div>
+                        <div class="small text-muted">Modes utilisés</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@functions {
+    private string GetProgressBarClass(ModePaiement mode)
+    {
+        return mode switch
+        {
+            ModePaiement.Especes => "bg-success",
+            ModePaiement.Cheque => "bg-primary",
+            ModePaiement.Effet => "bg-warning",
+            ModePaiement.VirementBancaire => "bg-info",
+            _ => "bg-secondary"
+        };
+    }
+
+    private string GetModeColor(ModePaiement mode)
+    {
+        return mode switch
+        {
+            ModePaiement.Especes => "#28a745",
+            ModePaiement.Cheque => "#007bff",
+            ModePaiement.Effet => "#ffc107",
+            ModePaiement.VirementBancaire => "#17a2b8",
+            _ => "#6c757d"
+        };
+    }
+}
+
+<style>
+    .stats-card {
+        transition: all 0.3s ease;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+        .stats-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+    .stats-number {
+        font-size: 1.8rem;
+        font-weight: 700;
+        line-height: 1.2;
+    }
+
+    .stats-label {
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 2px;
+    }
+
+    .stats-sublabel {
+        font-size: 0.75rem;
+        opacity: 0.8;
+    }
+
+    .stats-icon {
+        flex-shrink: 0;
+        margin-left: 15px;
+    }
+
+    .mode-stat-card {
+        background: #fff;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 1rem;
+        height: 100%;
+        transition: all 0.2s ease;
+    }
+
+        .mode-stat-card:hover {
+            border-color: #007bff;
+            box-shadow: 0 4px 12px rgba(0,123,255,0.15);
+        }
+
+    .mode-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .pie-chart-container {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    .pie-chart {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background: conic-gradient( #28a745 0deg 90deg, #007bff 90deg 180deg, #ffc107 180deg 270deg, #17a2b8 270deg 360deg );
+        margin: 0 auto 20px;
+        position: relative;
+    }
+
+        .pie-chart::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+    .legend-item {
+        display: inline-flex;
+        align-items: center;
+        margin: 0.25rem 0.5rem;
+    }
+
+    .legend-color {
+        width: 16px;
+        height: 16px;
+        border-radius: 3px;
+        margin-right: 8px;
+        flex-shrink: 0;
+    }
+
+    .legend-text {
+        font-size: 0.9rem;
+    }
+
+    .progress {
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        transition: width 0.6s ease;
+    }
+
+   
+</style>

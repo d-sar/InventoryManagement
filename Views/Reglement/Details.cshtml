@@ -1,0 +1,325 @@
+﻿@using InventoryManagementMVC.Models.Entities
+@using InventoryManagementMVC.Models.ViewModels.gestiondesReglements
+@model ReglementDetailsViewModel
+
+@{
+    ViewData["Title"] = "Détails du règlement";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>
+        <i class="fas fa-eye me-2 text-primary"></i>
+        Détails du règlement
+    </h2>
+    <div class="btn-group">
+        <a asp-action="Edit" asp-route-id="@Model.Reglement.IdReglement" class="btn btn-primary">
+            <i class="fas fa-edit me-1"></i>Modifier
+        </a>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i>Retour
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Informations principales -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>Informations principales
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="info-item mb-3">
+                            <label class="text-muted small">ID Règlement</label>
+                            <div class="fw-bold fs-5">
+                                <span class="badge bg-primary">#@Model.Reglement.IdReglement</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-item mb-3">
+                            <label class="text-muted small">Date de paiement</label>
+                            <div class="fw-bold fs-5">
+                                <i class="fas fa-calendar text-primary me-2"></i>
+                                @Model.Reglement.DatePaiement.ToString("dddd dd MMMM yyyy")
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="info-item mb-3">
+                            <label class="text-muted small">@Model.TypePartenaire</label>
+                            <div class="fw-bold fs-5">
+                                @if (Model.Reglement.Partenaire is Client)
+                                {
+                                    <span class="badge bg-success me-2">CLIENT</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark me-2">FOURNISSEUR</span>
+                                }
+                                @Model.Reglement.Partenaire.Nom
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-item mb-3">
+                            <label class="text-muted small">Montant</label>
+                            <div class="fw-bold fs-4 text-success">
+                                <i class="fas fa-dh-sign me-2"></i>
+                                @Model.Reglement.Montant.ToString("N2") DH
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Détails du paiement -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-credit-card me-2"></i>Détails du paiement
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="info-item mb-3">
+                            <label class="text-muted small">Mode de paiement</label>
+                            <div class="fw-bold fs-5">
+                                @switch (Model.Reglement.ModePaiement)
+                                {
+                                    case ModePaiement.Especes:
+                                        <span class="badge bg-success fs-6">
+                                            <i class="fas fa-money-bill-wave me-2"></i>
+                                            @Html.DisplayFor(m => Model.Reglement.ModePaiement)
+                                        </span>
+                                        break;
+                                    case ModePaiement.Cheque:
+                                        <span class="badge bg-primary fs-6">
+                                            <i class="fas fa-money-check me-2"></i>
+                                            @Html.DisplayFor(m => Model.Reglement.ModePaiement)
+                                        </span>
+                                        break;
+                                    case ModePaiement.Effet:
+                                        <span class="badge bg-warning text-dark fs-6">
+                                            <i class="fas fa-file-invoice me-2"></i>
+                                            @Html.DisplayFor(m => Model.Reglement.ModePaiement)
+                                        </span>
+                                        break;
+                                    case ModePaiement.VirementBancaire:
+                                        <span class="badge bg-info fs-6">
+                                            <i class="fas fa-university me-2"></i>
+                                            @Html.DisplayFor(m => Model.Reglement.ModePaiement)
+                                        </span>
+                                        break;
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-item mb-3">
+                            <label class="text-muted small">Numéro de paiement</label>
+                            <div class="fw-bold fs-5">
+                                @if (!string.IsNullOrEmpty(Model.Reglement.NumeroPaiement))
+                                {
+                                    <code class="bg-light p-2 rounded">@Model.Reglement.NumeroPaiement</code>
+                                }
+                                else
+                                {
+                                    <span class="text-muted fst-italic">Non spécifié</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.Reglement.Note))
+                {
+                    <div class="info-item">
+                        <label class="text-muted small">Note / Remarque</label>
+                        <div class="bg-light p-3 rounded mt-2">
+                            <i class="fas fa-sticky-note text-warning me-2"></i>
+                            @Model.Reglement.Note
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Panneau latéral -->
+    <div class="col-lg-4">
+        <!-- Statistiques du partenaire -->
+        <div class="card border-info mt-3">
+            <div class="card-header bg-info text-white">
+                <h6 class="mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>Informations partenaire
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="text-center">
+                    <div class="mb-2">
+                        @if (Model.Reglement.Partenaire is Client)
+                        {
+                            <i class="fas fa-user-tie fa-3x text-success"></i>
+                        }
+                        else
+                        {
+                            <i class="fas fa-truck fa-3x text-warning"></i>
+                        }
+                    </div>
+                    <h6 class="fw-bold">@Model.Reglement.Partenaire.Nom</h6>
+                    <p class="small text-muted mb-2">
+                        @if (!string.IsNullOrEmpty(Model.Reglement.Partenaire.Email))
+                        {
+                            <i class="fas fa-envelope me-1"></i>
+                            @Model.Reglement.Partenaire.Email
+
+                            <br>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.Reglement.Partenaire.Telephone))
+                        {
+                            <i class="fas fa-phone me-1"></i>
+                            @Model.Reglement.Partenaire.Telephone
+                        }
+                    </p>
+                    <a asp-controller="Reglement" asp-action="ByPartenaire" asp-route-partenaireId="@Model.Reglement.IdUser" class="btn btn-sm btn-outline-info">
+                        <i class="fas fa-list me-1"></i>Voir tous ses règlements
+                    </a>
+                </div>
+            </div>
+        </div>
+        <!-- Actions rapides -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-bolt me-2"></i>Actions rapides
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a asp-action="Edit" asp-route-id="@Model.Reglement.IdReglement" class="btn btn-primary">
+                        <i class="fas fa-edit me-2"></i>Modifier ce règlement
+                    </a>
+                    <button type="button" class="btn btn-outline-danger" onclick="confirmDelete(@Model.Reglement.IdReglement, '@Model.Reglement.Partenaire.Nom', '@Model.Reglement.DatePaiement.ToString("dd/MM/yyyy")')">
+                        <i class="fas fa-trash me-2"></i>Supprimer
+                    </button>
+                    <hr>
+                    <a asp-action="Create" class="btn btn-outline-success">
+                        <i class="fas fa-plus me-2"></i>Nouveau règlement
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Informations système -->
+        <div class="card border-secondary">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-cog me-2"></i>Informations système
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="info-item mb-2">
+                    <label class="text-muted small">Date de création</label>
+                    <div class="small">
+                        <i class="fas fa-clock text-muted me-1"></i>
+                        @Model.Reglement.DateCreation.ToString("dd/MM/yyyy à HH:mm")
+                    </div>
+                </div>
+                <div class="info-item mb-2">
+                    <label class="text-muted small">ID Partenaire</label>
+                    <div class="small">
+                        <span class="badge bg-light text-dark">#@Model.Reglement.IdUser</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+       
+    </div>
+</div>
+
+<!-- Modal de suppression -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer le règlement de <strong id="partenaireToDelete"></strong> du <strong id="dateToDelete"></strong> ?</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Cette action ne pourra pas être annulée.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form method="post" asp-action="Delete" id="deleteForm">
+                    <input type="hidden" name="id" id="deleteId" />
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i>Supprimer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .info-item label {
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .card {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        border-radius: 0.5rem;
+        border: 1px solid rgba(0, 0, 0, 0.125);
+    }
+
+    .card-header {
+        background-color: rgba(13, 110, 253, 0.03);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    }
+
+    .badge.fs-6 {
+        font-size: 0.875rem !important;
+        padding: 0.5rem 0.75rem;
+    }
+
+    .btn-group .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .d-grid .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    code {
+        font-size: 0.9rem;
+        color: #e83e8c;
+    }
+</style>
+
+<script>
+    function confirmDelete(reglementId, partenaireNom, datePaiement) {
+        document.getElementById('deleteId').value = reglementId;
+        document.getElementById('partenaireToDelete').textContent = partenaireNom;
+        document.getElementById('dateToDelete').textContent = datePaiement;
+        new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    }
+</script>

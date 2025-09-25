@@ -38,6 +38,6 @@ namespace InventoryManagementMVC.Models.Entities
         public DateTime DateCreation { get; set; } = DateTime.Now;
 
         // Navigation properties
-        public virtual User Partenaire { get; set; }
+        public virtual User? Partenaire { get; set; }
     }
 }
